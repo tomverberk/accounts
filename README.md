@@ -19,6 +19,9 @@ To do this we first go to the github website.
 1. Make a new issue, state in the description what you are going to do (for example, Get question from database).
 1. Go to github desktop
 1. Create a new branch, let it look like this "#<ID>:<Description>" Where #ID is the id number of the issue found on the github webpage.
+1. After you are done working you go to github desktop, you give a summary of your commit and you commit your work.
+1. Once you have completed the assignment you   go to the github webpage: press -> pull request and create a new pull request, this way the code you made will be visible for everyone.
+1. this will ensure we don't do double stuff.
 
 
 
