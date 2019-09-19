@@ -34,3 +34,6 @@ To do this we first go to the github website.
 1. After you are done working you go to github desktop, you give a summary of your commit and you commit your work.
 1. Once you have completed the assignment you   go to the github webpage: press -> pull request and create a new pull request, this way the code you made will be visible for everyone.
 1. this will ensure we don't do double stuff.
+  
+  If you have trouble working with python I can recommand this tutorial.
+  https://tutorial.djangogirls.org/en/dynamic_data_in_templates/
