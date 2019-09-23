@@ -2,28 +2,32 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-
-class Score(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    scoreModule1 = models.IntegerField()
-    scoreModule2 = models.IntegerField()
-    scoreModule3 = models.IntegerField()
-    scoreModule4 = models.IntegerField()
-    scoreModule5 = models.IntegerField()
-    scoreModule6 = models.IntegerField()
-    scoreModule7 = models.IntegerField()
-    scoreModule8 = models.IntegerField()
-    scoreModule9 = models.IntegerField()
-    scoreModule10 = models.IntegerField()
-    scoreModule11 = models.IntegerField()
-    scoreModule12 = models.IntegerField()
-    scoreModule13 = models.IntegerField()
-    scoreModule14 = models.IntegerField()
-    scoreModule15 = models.IntegerField()
-    scoreModule16 = models.IntegerField()
-    scoreModule17 = models.IntegerField()
-    scoreModule18 = models.IntegerField()
-    scoreModule19 = models.IntegerField()
-    scoreModule20 = models.IntegerField()
-
 # Create your models here.
+
+class User(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    generalIntelligence = models.IntegerField(default = 0)
+
+class Module(models.Model):
+    moduleName = models.CharField(max_length=42)
+    
+
+class Module_User(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE)
+    currentModule = models.BooleanField(default = False)
+    amountCorrect = models.IntegerField(default = 0)
+    amountWrong = models.IntegerField(default = 0)
+    amountHints = models.IntegerField(default = 0)
+    moduleScore = models.IntegerField(default = 0)
+
+class Chapter(models.Model):
+    chapterName = models.CharField(max_length=42)
+
+class Chapter_User(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
+    chapterIntelligence = models.IntegerField(default = 0)
+    
+
+
