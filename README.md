@@ -37,3 +37,9 @@ To do this we first go to the github website.
   
   If you have trouble working with python I can recommand this tutorial.
   https://tutorial.djangogirls.org/en/dynamic_data_in_templates/
+
+## models to tables
+- save file(s)
+- create table for models, so they can be used in views: py manage.py makemigrations accounts
+- apply migration: py manage.py migrate accounts
+- re-run server: py manage.py runserver

@@ -8,35 +8,81 @@ class Score(models.Model):
     score = models.TextField()
 
 class ModuleOverview(models.Model): 
-    def __init__(self, name):
-        self.name = 'moduleOverview'
-    
     title = models.CharField(max_length=200)
     text = models.TextField()
-    # submodule = models.SubModule()
-    # module_exam = models.ModuleExam()
-
-#class Module():
-#    def __init__(self,name,subs):
-#        self.name = moduleName
-#        self.subs = 5
-    # template for specific module
-    # url for specific module
-
-    # has subModules
-
-# class SubModule():
-#    def __init__(self, name, exercises):
-#        self.name = subModuleName
-        # self.name = moduleName.SubNumber     ## this is the format that is preferable
     
-    # template for specific submodule
-    # url for specific submodule
+    def publish(self):
+        self.publish_date = timezone.now()
+        self.save()
 
-    # has Exercises 
+    def __str__(self):
+        return self.title
 
-#class Exercise():
-#    def __init__(self, name):
-#        self.name = Exercise
+class Module(models.Model): 
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    
+    def publish(self):
+        self.publish_date = timezone.now()
+        self.save()
 
-#class Exam():
+    def __str__(self):
+        return self.title
+
+    def template_name(self):
+        return self
+        # return str self.title .html str make this a combination of a string with the title-variable and '.html' !
+
+    # has sub-modules
+    # has Module Exam
+
+class SubModule(models.Model): # make a child of Module?
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    
+    def publish(self):
+        self.publish_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+    def template_name(self):
+        return self
+        # return str self.title .html str make this a combination of a string with the title-variable and '.html' !
+
+    # has exercises
+
+class Exercise(models.Model): # make a child of Sub-Module?
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    
+    def publish(self):
+        self.publish_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+    def template_name(self):
+        return self
+        # return str self.title .html str make this a combination of a string with the title-variable and '.html' !
+
+    # make children for the various types of exercises
+     
+class Exam(models.Model):
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    
+    def publish(self):
+        self.publish_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+    def template_name(self):
+        return self
+        # return str self.title .html str make this a combination of a string with the title-variable and '.html' !
+
+    # select exercises from each submodule for a module, and from each module for 'overview-tests'
