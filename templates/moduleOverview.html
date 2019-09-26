@@ -1,0 +1,24 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %} Hoofdstukken Overzicht  {% endblock %}</title>
+</head>
+<body>
+  <main>
+    {% block content %}
+    Kies een module:
+    <p><a href="{% url 'module1' %}"> Hoofdstuk 1 </a></p>
+    \t <p><a href="{% url 'module1_1' %}">  Hoofdstuk 1.1 </a></p>
+    \t #<p><a href="{% url 'module1_2' %}"> Hoofdstuk 1.2 </a></p>
+    \t #<p><a href="{% url 'module1_3' %}"> Hoofdstuk 1.3 </a></p>
+    \t #<p><a href="{% url 'module1_4' %}"> Hoofdstuk 1.4 </a></p>
+    \t #<p><a href="{% url 'module1_5' %}"> Hoofdstuk 1.5 </a></p>
+    \t #<p><a href="{% url 'module1_6' %}"> Hoofdstuk 1.6 </a></p>
+    \t #<p><a href="{% url 'module1_exam' %}"> Toets Hoofdstuk 1 </a></p>
+    
+    {% endblock %}
+  </main>
+</body>
+</html>
