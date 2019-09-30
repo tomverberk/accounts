@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.shortcuts import render
+from django.http import HttpResponse
 from .models import Score, ModuleOverview, Module, SubModule, Exam
 
 def showInfo(request):
@@ -18,23 +19,31 @@ def moduleOverview(request):     # maybe make this a normal class as well, and j
    list = ModuleOverview.text
    return render(request, 'moduleOverview.html', {'Hoofdstukken overzicht': list} )
 
-moduleone = Module()
-moduleone.template_name = 'module1.html'
+def module1(request):
+    text = "Wat is het goede antwoord " # % number
+    return render(request,'module1.html', {'vraag': text} )
+    #return render(request, 'accounts/module1_1.html', {'vragen lijst': text} )
 
-module1_1 = SubModule()
-module1_1.template_name = 'module1.html'
+def module1_1(request):
+    text = "Wat is het goede antwoord " # % number
+    return render(request,'module1_1.html', {'vraag': text} )
 
-module1_2 = SubModule()
-module1_2.template_name = 'module1_2.html'
+def module1_2(request):
+    text = "Wat is het goede antwoord " # % number
+    return render(request,'module1_1.html', {'vraag': text} )
 
-module1_3 = SubModule()
-module1_3.template_name = 'module1_3.html'
+def module1_3(request):
+    text = "Wat is het goede antwoord " # % number
+    return render(request,'module1_1.html', {'vraag': text} )
 
-module1_4 = SubModule()
-module1_4.template_name = 'module1_4.html'
+def module1_4(request):
+    text = "Wat is het goede antwoord " # % number
+    return render(request,'module1_1.html', {'vraag': text} )
 
-module1_5 = SubModule()
-module1_5.template_name = 'module1_5.html'
+def module1_5(request):
+    text = "Wat is het goede antwoord " # % number
+    return render(request,'module1_1.html', {'vraag': text} )
 
-module1_exam = Exam()
-module1_exam.template_name = 'module1_exam.html'
+def module1_exam(request):
+    text = "Wat is het goede antwoord " # % number
+    return render(request,'module1_exam.html', {'vraag': text} )
