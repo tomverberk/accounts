@@ -9,6 +9,8 @@
   <p><a href="{% url 'logout' %}">logout</a></p>
   Check here for some database info
   <a href="{% url 'showInfo' %}">Database info</a>
+  Press here to answer a question
+  <a href="{% url 'exampleQuestion' %}">Example question</a>
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">login</a><br><br>

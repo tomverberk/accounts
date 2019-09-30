@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>Django Girls blog</title>
+    </head>
+    <body>
+        <div>
+            {% for question in questions %}
+                {{ question.question }}
+            {% endfor %}
+        </div>
+        <form action="answer/" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <p>Answer: <input type="text" name="answer"></p>
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
