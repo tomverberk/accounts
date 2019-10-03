@@ -8,40 +8,6 @@ class User(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     generalIntelligence = models.IntegerField(default = 0)
 
-class Module(models.Model):
-    moduleName = models.CharField(max_length=42)
-    
-
-class Module_User(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    module = models.ForeignKey(Module, on_delete=models.CASCADE)
-    currentModule = models.BooleanField(default = False)
-    amountCorrect = models.IntegerField(default = 0)
-    amountWrong = models.IntegerField(default = 0)
-    amountHints = models.IntegerField(default = 0)
-    moduleScore = models.IntegerField(default = 0)
-
-class Chapter(models.Model):
-    chapterName = models.CharField(max_length=42)
-
-class Chapter_User(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
-    chapterIntelligence = models.IntegerField(default = 0)
-    
-
-
-class ModuleOverview(models.Model): 
-    title = models.CharField(max_length=200)
-    text = models.TextField()
-    
-    def publish(self):
-        self.publish_date = timezone.now()
-        self.save()
-
-    def __str__(self):
-        return self.title
-
 class Module(models.Model): 
     title = models.CharField(max_length=200)
     text = models.TextField()
@@ -59,6 +25,35 @@ class Module(models.Model):
 
     # has sub-modules
     # has Module Exam
+
+class Module_User(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE)
+    currentModule = models.BooleanField(default = False)
+    amountCorrect = models.IntegerField(default = 0)
+    amountWrong = models.IntegerField(default = 0)
+    amountHints = models.IntegerField(default = 0)
+    moduleScore = models.IntegerField(default = 0)
+
+class Chapter(models.Model):
+    name = models.CharField(max_length=200)
+
+class Chapter_User(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
+    chapterIntelligence = models.IntegerField(default = 0)
+    
+class ModuleOverview(models.Model): 
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    
+    def publish(self):
+        self.publish_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
+
 
 class SubModule(models.Model): # make a child of Module?
     title = models.CharField(max_length=200)

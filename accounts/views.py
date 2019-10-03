@@ -4,14 +4,14 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import User, Score, ModuleOverview, Module, SubModule, Exam
+from .models import User, ModuleOverview, Module, SubModule, Exam
 from .forms import AnswerForm
 import random
 
 
 def showInfo(request):
-    generateIntelligence = generateIntelligence.objects.all()
-    return render(request, 'accounts/showInfo.html', {'generalIntelligence': generalIntelligence})
+#    generateIntelligence = generateIntelligence.objects.all()
+    return render(request, 'accounts/showInfo.html' ) #{'generalIntelligence': generalIntelligence})
 
 def exampleQuestion(request):
     question = {}
@@ -19,12 +19,11 @@ def exampleQuestion(request):
     b = random.randint(1,101)
     question["question"] = "%s + %s =" %(a,b)  
     question["answer"] = "%s" %(a+b)
-    global answer
-    answer = question["answer"]
+    global correct_answer
+    correct_answer = question["answer"]
     questions = []
     questions.append(question)
     
-
     return render(request, 'accounts/exampleQuestion.html', {'questions':questions})
 
 class SignUp(generic.CreateView):
@@ -64,21 +63,20 @@ def module1_5(request):
 def module1_exam(request):
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1_exam.html', {'vraag': text} )
+
 def answer(request):
     global answer
     answerGiven = request.POST['answer']
-    answerOriginal = answer
+    answerOriginal = correct_answer
     print(answerGiven)
-    print(answer)
+    print(correct_answer)
     print(answerOriginal)
     if answerGiven == answerOriginal:
         text = "your answer was correct"
     else:
         text = "your answer was wrong"
     
-    return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
-
-    
+    return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})   
 
 def get_answer(request):
     # if this is a POST request we need to process the form data
@@ -93,7 +91,7 @@ def get_answer(request):
             # redirect to a new URL:
 
 
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponse('/thanks/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
