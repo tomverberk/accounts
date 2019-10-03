@@ -6,15 +6,21 @@
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
     <body>
-        NOTHING TO SEE HERE
-        <div>
-                your answer: <br>
+        <form action="{% url 'home' %}">
+            <button>Home</button>
+        </form>
+        <div class = "form">
+                {{ text }}<br>
+                <br>
+                Your answer: <br>
                 {{ answerGiven }} <br>
-                correct answer: <br>
+                Correct answer: <br>
                 {{ answerOriginal }} <br>
-
-                {{ text }}
-                
-            </div>
+                <br>
+                <form action="{% url 'exampleQuestion' %}">
+                    <button>New question</button>
+                </form>
+        </div>
+        
     </body>
 </html>
