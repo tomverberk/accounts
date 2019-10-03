@@ -121,5 +121,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # my_project/settings.py
+
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+#from django.urls import reverse_lazy
+#LOGIN_REDIRECT_URL = reverse_lazy('home')
+#LOGIN_URL = reverse_lazy('login')
+#LOGOUT_REDIRECT_URL = reverse_lazy('logout')
