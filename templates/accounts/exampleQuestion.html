@@ -9,7 +9,7 @@
         <form action="{% url 'home' %}">
             <button>Home</button>
         </form>
-        <form class = "form" action="answer/" method="post">
+        <form class = "base" action="answer/" method="post">
             {% for question in questions %}
                 {{ question.question }}
             {% endfor %}
