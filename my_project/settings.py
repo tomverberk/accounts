@@ -71,6 +71,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'my_project.wsgi.application'
 
 
+
+
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -125,6 +127,7 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
 #from django.urls import reverse_lazy
 #LOGIN_REDIRECT_URL = reverse_lazy('home')
 #LOGIN_URL = reverse_lazy('login')
