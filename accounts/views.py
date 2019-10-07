@@ -35,8 +35,8 @@ def create_user(conn, user):
     :param project:
     :return: project id
     """
-    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5) 
-                                VALUES (?, false, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0) """
+    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5, currentQuestionHints, currentQuestionCorrect) 
+                                VALUES (?, false, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0) """
     cur = conn.cursor()
     cur.execute(sql, user)
     return cur.lastrowid
@@ -46,6 +46,7 @@ def insertNewUser(user_id):
  
     # create a database connection
     conn = create_connection(database)
+    print('ahhhhh')
 
     modules = Module.objects.all()
     for module in modules:
@@ -54,7 +55,7 @@ def insertNewUser(user_id):
             user_Module = (user_id, module.id);
             addModule = create_user(conn, user_Module)
 
-def AnswerAnswered(user_id, module_id, correct):
+def AnswerAnswered(user_id, module_id, correct, hintsUsed):
     database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
  
     # create a database connection
@@ -62,36 +63,36 @@ def AnswerAnswered(user_id, module_id, correct):
 
     with conn:
         # create a new project
-        addModule = answerAnsweredCorrect(conn, user_id, module_id, correct)
+            answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed)
 
 
-def answerAnsweredCorrect(conn, user_id, module_id, correct):
+def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed):
     user_module = (user_id, module_id)
     if correct:
-        sql_request = 'SELECT amountCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        sql_request_amount = 'SELECT amountCorrect, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
     else:
-        sql_request = 'SELECT amountWrong FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+
 
     cur = conn.cursor()
-    
-    cur.execute(sql_request, user_module)
+    cur.execute(sql_request_amount, user_module)
     records = cur.fetchall()
-    print(user_id)
-    print(module_id)
-    print(records)
-    record = records[0][0]+1
-    newcorrect = [record, user_id, module_id]
+    if(correct):
+        newCurrentQuestionCorrect = records[0][3]+1
+    else:
+        newCurrentQuestionCorrect = records[0][3]
+    newAmountHints = records[0][1]+hintsUsed
+    newcurrentQuestionHints = records[0][2]+hintsUsed
+    newAmountCorrect_Wrong = records[0][0]+1
+    newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, user_id, module_id]
 
     if correct:
-        sql = 'UPDATE accounts_module_user SET amountCorrect = ? WHERE user_id = ? AND module_id = ?'
+        sql = 'UPDATE accounts_module_user SET amountCorrect = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ? WHERE user_id = ? AND module_id = ?'
     else:
-        sql = 'UPDATE accounts_module_user SET amountWrong = ? WHERE user_id = ? AND module_id = ?'
+        sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ? WHERE user_id = ? AND module_id = ?'
 
     cur = conn.cursor()
     cur.execute(sql,newcorrect)
-    print(user_module)
-    print('check')
-    
 
 def showInfo(request):
 #    generateIntelligence = generateIntelligence.objects.all()
@@ -180,11 +181,11 @@ def answer(request):
     
     if answerGiven == answerOriginal:
         text = "your answer was correct"
-        AnswerAnswered(user.id, module_id, True)
+        AnswerAnswered(user.id, module_id, True, 0)
 
     else:
         text = "your answer was wrong"
-        AnswerAnswered(user.id, module_id, False)
+        AnswerAnswered(user.id, module_id, False, 0)
     
     return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
 

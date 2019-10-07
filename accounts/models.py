@@ -46,6 +46,8 @@ class Module_User(models.Model):
     mistake3 = models.IntegerField(default = 0)
     mistake4 = models.IntegerField(default = 0)
     mistake5 = models.IntegerField(default = 0)
+    currentQuestionHints = models.IntegerField(default = 0)
+    currentQuestionCorrect = models.IntegerField(default = 0)
 
 class Chapter(models.Model):
     name = models.CharField(max_length=200)
