@@ -71,6 +71,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'my_project.wsgi.application'
 
 
+
+
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -123,3 +125,5 @@ STATIC_URL = '/static/'
 # my_project/settings.py
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
