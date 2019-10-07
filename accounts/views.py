@@ -1,14 +1,93 @@
 # accounts/views.py
-from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import User, ModuleOverview, Module, SubModule, Exam
-from .forms import AnswerForm
-import random
+from .models import CustomUser, ModuleOverview, Module, SubModule, Exam
+from .forms import AnswerForm, CustomUserCreationForm, CustomUserChangeForm
+import random, mysql.connector, sqlite3, getpass
+from mysql.connector import MySQLConnection, Error
+from sqlite3 import Error
 #import numpy as np
 
+def create_connection(db_file):
+    """ create a database connection to the SQLite database
+        specified by db_file
+    :param db_file: database file
+    :return: Connection object or None
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+    except Error as e:
+        print(e)
+ 
+    return conn
+
+def create_user(conn, user):
+    """
+    Create a new project into the projects table
+    :param conn:
+    :param project:
+    :return: project id
+    """
+    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5) 
+                                VALUES (?, false, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0) """
+    cur = conn.cursor()
+    cur.execute(sql, user)
+    return cur.lastrowid
+
+def insertNewUser(user_id):
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+ 
+    # create a database connection
+    conn = create_connection(database)
+
+    modules = Module.objects.all()
+    for module in modules:
+        with conn:
+            # create a new project
+            user_Module = (user_id, module.id);
+            addModule = create_user(conn, user_Module)
+
+def AnswerAnswered(user_id, module_id, correct):
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+ 
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+        addModule = answerAnsweredCorrect(conn, user_id, module_id, correct)
+
+
+def answerAnsweredCorrect(conn, user_id, module_id, correct):
+    user_module = (user_id, module_id)
+    if correct:
+        sql_request = 'SELECT amountCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+    else:
+        sql_request = 'SELECT amountWrong FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+
+    cur = conn.cursor()
+    
+    cur.execute(sql_request, user_module)
+    records = cur.fetchall()
+    print(user_id)
+    print(module_id)
+    print(records)
+    record = records[0][0]+1
+    newcorrect = [record, user_id, module_id]
+
+    if correct:
+        sql = 'UPDATE accounts_module_user SET amountCorrect = ? WHERE user_id = ? AND module_id = ?'
+    else:
+        sql = 'UPDATE accounts_module_user SET amountWrong = ? WHERE user_id = ? AND module_id = ?'
+
+    cur = conn.cursor()
+    cur.execute(sql,newcorrect)
+    print(user_module)
+    print('check')
+    
 
 def showInfo(request):
 #    generateIntelligence = generateIntelligence.objects.all()
@@ -24,13 +103,33 @@ def exampleQuestion(request):
     correct_answer = question["answer"]
     questions = []
     questions.append(question)
-    
     return render(request, 'accounts/exampleQuestion.html', {'questions':questions})
 
-class SignUp(generic.CreateView):
-    form_class = UserCreationForm
-    success_url = reverse_lazy('login')
-    template_name = 'signup.html'
+def signUp(request):
+    
+    
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            
+            users = CustomUser.objects.all()
+            for user in users:
+                if user.username == username:
+                    insertNewUser(user.id)
+                    request.session['username'] = user.id
+
+            return render(request, 'home.html')
+    else:
+        form_class = CustomUserCreationForm
+        success_url = reverse_lazy('login')
+        template_name = 'signup.html'
+        form = CustomUserCreationForm(request.POST)
+    return render(request, 'signup.html', {'form': form})
+    
+
 
 def moduleOverview(request):     # maybe make this a normal class as well, and just fill the few submodules manually?
    list = ModuleOverview.text
@@ -156,6 +255,25 @@ def module1_exam(request):
     return render(request,'module1/module1_exam.html', {'vraag': text} )
 
 
+def answer(request):
+    global answer
+    answerGiven = request.POST['answer']
+    answerOriginal = correct_answer
+    print(answerGiven)
+    print(correct_answer)
+    print(answerOriginal)
+    user = request.user
+    module_id = 1
+    
+    if answerGiven == answerOriginal:
+        text = "your answer was correct"
+        AnswerAnswered(user.id, module_id, True)
+
+    else:
+        text = "your answer was wrong"
+        AnswerAnswered(user.id, module_id, False)
+    
+    return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
 
 def get_answer(request):
     # if this is a POST request we need to process the form data
