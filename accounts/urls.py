@@ -14,7 +14,7 @@ urlpatterns = [
     path('showInfo/', views.showInfo, name='showInfo'),
 
     path('exampleQuestion', views.exampleQuestion, name='exampleQuestion'),
-    path('answer/', views.answer, name='answer')
+    path('answer/', views.answer, name='answer'),
     
     path('moduleOverview/', views.moduleOverview, name='moduleOverview'),
     path('module1/', views.module1, name='module1'),

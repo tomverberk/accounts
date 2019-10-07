@@ -91,8 +91,8 @@ def answerAnsweredCorrect(conn, user_id, module_id, correct):
     
 
 def showInfo(request):
-    generalIntelligence = generateIntelligence.objects.all()
-    return render(request, 'accounts/showInfo.html', {'generalIntelligence': generalIntelligence})
+#    generateIntelligence = generateIntelligence.objects.all()
+    return render(request, 'accounts/showInfo.html' ) #{'generalIntelligence': generalIntelligence})
 
 def exampleQuestion(request):
     question = {}
@@ -100,8 +100,8 @@ def exampleQuestion(request):
     b = random.randint(1,101)
     question["question"] = "%s + %s =" %(a,b)  
     question["answer"] = "%s" %(a+b)
-    global answer
-    answer = question["answer"]
+    global correct_answer
+    correct_answer = question["answer"]
     questions = []
     questions.append(question)
     return render(request, 'accounts/exampleQuestion.html', {'questions':questions})
@@ -164,12 +164,13 @@ def module1_5(request):
 def module1_exam(request):
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1_exam.html', {'vraag': text} )
+
 def answer(request):
     global answer
     answerGiven = request.POST['answer']
-    answerOriginal = answer
+    answerOriginal = correct_answer
     print(answerGiven)
-    print(answer)
+    print(correct_answer)
     print(answerOriginal)
     user = request.user
     module_id = 1
@@ -197,7 +198,7 @@ def get_answer(request):
             # redirect to a new URL:
 
 
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponse('/thanks/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
