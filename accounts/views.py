@@ -5,8 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import CustomUser, ModuleOverview, Module, SubModule, Exam
 from .forms import AnswerForm, CustomUserCreationForm, CustomUserChangeForm
-import random, mysql.connector, sqlite3, getpass
-from mysql.connector import MySQLConnection, Error
+import random, sqlite3, getpass
 from sqlite3 import Error
 #import numpy as np
 
@@ -47,7 +46,7 @@ def insertNewUser(user_id):
     for module in modules:
         with conn:
             # create a new project
-            user_Module = (user_id, module.id);
+            user_Module = (user_id, module.id)
             addModule = create_user(conn, user_Module)
 
 def AnswerAnswered(user_id, module_id, correct):
@@ -58,7 +57,7 @@ def AnswerAnswered(user_id, module_id, correct):
 
     with conn:
         # create a new project
-        addModule = answerAnsweredCorrect(conn, user_id, module_id, correct)
+        answerAnsweredCorrect(conn, user_id, module_id, correct)
 
 
 def answerAnsweredCorrect(conn, user_id, module_id, correct):
