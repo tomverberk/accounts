@@ -4,17 +4,31 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
-  Hi {{ user.username }}!<br><br><br>
-  <form action="{% url 'showInfo' %}"><button>Score</button></form><br><br><br>
-  <form action="{% url 'exampleQuestion' %}"><button>New question</button></form><br><br><br>
-  <form action="{% url 'logout' %}"><button>Logout</button></form><br><br><br>
+<div class="base" style="max-width: 720px;">
+  {% if user.is_authenticated %}
+    Hi {{ user.username }}!<br><br><br>
+    <form action="{% url 'showInfo' %}"><button>Score</button></form><br><br><br>
+    <form action="{% url 'exampleQuestion' %}"><button>New question</button></form><br><br><br>
+    <!--<form action="{% url 'logout' %}"><button>Logout</button></form><br><br><br>-->
+    <chaptergrid>
+    <form action="hoofdstuk1.html">
+      <chapter style="float:left">Hoofdstuk 1</chapter>
+    </form>
 
-{% else %}
-  Welcome
-  <p>You are not logged in</p>
-  <form action="{% url 'login' %}"><button>Login</button></form><br><br><br><br><br><br><br>
-  If you do not yet have an account<br><br>
-  <form action="{% url 'signup' %}"><button>Sign up</button></form><br>
-{% endif %}
+    <form action="hoofdstuk1.html">
+      <chapter style="float:none">Hoofdstuk 2</chapter>
+    </form>
+
+    <form action="hoofdstuk1.html">
+      <chapter style="float:right">Hoofdstuk 3</chapter>
+    </form>
+    </chaptergrid>
+  {% else %}
+    <h1>Welcome</h1>
+    <p>You are not logged in</p>
+    <form action="{% url 'login' %}"><button>Login</button></form><br><br><br><br><br><br><br>
+    If you do not yet have an account<br><br>
+    <form action="{% url 'signup' %}"><button>Sign up</button></form><br>
+  {% endif %}
+</div>
 {% endblock %}

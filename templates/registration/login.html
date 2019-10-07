@@ -5,16 +5,16 @@
 
 {% block content %}
 
-<div class="login-page">
-    <div class="form">
-      <form class="login-form" method="post">
-        <h1>Login</h1>
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button>login</button><br><br>
-          <p class="message">Not registered? <a href="{% url 'signup' %}">Create an account</a></p>
-        </form>
-    </div>
-  </div>
+
+<div class="base">
+  <form class="login-form" method="post">
+    <h1>Login</h1>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button>Login</button><br><br>
+    <p class="message">Not registered? <a href="{% url 'signup' %}">Create an account</a></p>
+  </form>
+</div>
+
 
 {% endblock %}
