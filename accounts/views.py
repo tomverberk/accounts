@@ -35,8 +35,8 @@ def create_user(conn, user):
     :param project:
     :return: project id
     """
-    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id) 
-                                VALUES (?, false, 0, 0, 0, 0, ?) """
+    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5) 
+                                VALUES (?, false, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0) """
     cur = conn.cursor()
     cur.execute(sql, user)
     return cur.lastrowid
@@ -76,6 +76,9 @@ def answerAnsweredCorrect(conn, user_id, module_id, correct):
     
     cur.execute(sql_request, user_module)
     records = cur.fetchall()
+    print(user_id)
+    print(module_id)
+    print(records)
     record = records[0][0]+1
     newcorrect = [record, user_id, module_id]
 

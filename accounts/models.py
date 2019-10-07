@@ -41,6 +41,11 @@ class Module_User(models.Model):
     amountWrong = models.IntegerField(default = 0)
     amountHints = models.IntegerField(default = 0)
     moduleScore = models.IntegerField(default = 0)
+    mistake1 = models.IntegerField(default = 0)
+    mistake2 = models.IntegerField(default = 0)
+    mistake3 = models.IntegerField(default = 0)
+    mistake4 = models.IntegerField(default = 0)
+    mistake5 = models.IntegerField(default = 0)
 
 class Chapter(models.Model):
     name = models.CharField(max_length=200)
