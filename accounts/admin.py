@@ -13,3 +13,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['email', 'username',]
 
 admin.site.register(CustomUser, CustomUserAdmin)
+# Register your models here.
+from .models import ModuleOverview
+
+admin.site.register(ModuleOverview)
