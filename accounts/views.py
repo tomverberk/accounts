@@ -145,9 +145,11 @@ def module1_1a(request):
     b = random.randint(-20,20)
     c = random.randint(-20,20)
     d = random.randint(-3,3)
-    question["question"] = "%sx + %s + %sx + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sx + %s + %sx + %s" %(a,b,c,d) 
     question["answer_1"] = "%s" %(a+c)
-    question["answer_2"] = "%s"  %(b+d)
+    question["answer_2"] = "%s" %(b+d)
     question["answer"] = question["answer_1"], question["answer_2"]
     global correct_answer
     correct_answer = question["answer"]
@@ -157,16 +159,27 @@ def module1_1a(request):
     return render(request, 'module1/module1_1a.html', {'questions':questions})
 
 def answer1_1a(request):
-    #global answer
+    question = "%sx + %s + %sx + %s" %(variables[0],variables[1],variables[2],variables[3])
     answerGiven = request.POST['answer_1'], request.POST['answer_2']
     answerOriginal = correct_answer
-    if answerGiven == answerOriginal:
+    if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint = "De x-termen én constanten zijn niet goed bij elkaar opgeteld."
+    elif  answerGiven[0] != answerOriginal[0]:
+        text = "Jouw antwoord was fout."
+        hint = "De x-termen zijn niet goed opgeteld."
+    elif answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint = "De constanten zijn niet goed opgeteld."
+    elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
     else:
-        text = "Jouw antwoord was fout. Let goed op de plus- en mintekens."
-
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op de plus- en mintekens."
+    
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question})
 
 def module1_1b(request):
     question = {}
@@ -174,7 +187,9 @@ def module1_1b(request):
     b = random.randint(-20,20)
     c = random.randint(-20,20)
     d = random.randint(-5,5)
-    question["question"] = "%sx + %s = %sx + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sx + %s = %sx + %s" %(a,b,c,d)  
     question["answer_1"] = "%s" %(a-c)
     question["answer_2"] = "%s" %(d-b)
     question["answer"] = question["answer_1"], question["answer_2"]
@@ -186,16 +201,27 @@ def module1_1b(request):
     return render(request, 'module1/module1_1b.html', {'questions':questions})
 
 def answer1_1b(request):
-    #global answer
+    question = "%sx + %s = %sx + %s" %(variables[0],variables[1],variables[2],variables[3])
     answerGiven = request.POST['answer_1'], request.POST['answer_2']
     answerOriginal = correct_answer
-    if answerGiven == answerOriginal:
+    if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint = "Tel de x-termen goed op aan de linkerzijde. Tel de constanten goed op aan de rechterzijde. Let goed op plus- en mintekens."
+    elif answerGiven[0] != answerOriginal[0]:
+        text = "Jouw antwoord was fout."
+        hint = "De linkerzijde heeft niet (alleen) het goede aantal x-termen. Let goed op plus- en mintekens."
+    elif answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint =  "De rechterzijde heeft niet de goede waarde, de constanten zijn niet goed opgeteld. Let goed op plus- en mintekens."
+    elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
     else:
         text = "Jouw antwoord was fout."
+        hint = "Let goed op de plus- en mintekens."
 
     return render(request, 'accounts/answers/answer1_1b.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question})
 
 def module1_1c(request):
     question = {}
@@ -208,29 +234,94 @@ def module1_1c(request):
     a = left + c
     b = random.randint(-20,20)
     d = right + b
-    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)
     question["answer_1"] = a - c
     question["answer_2"] = d - b
     global correct_answer
-    correct_answer = str(question["answer"])
+    correct_answer = question["answer"]
     questions = []
     questions.append(question)
 
     return render(request, 'module1/module1_1c.html', {'questions':questions})
 
 def answer1_1c(request):
-    global answer
-    answerGiven = request.POST['answer']
-    answerOriginal = correct_answer
-    answerDiv = str(round(1/float(answerOriginal),2))
-    if answerGiven == answerDiv:
-       text = "Jouw antwoord was fout. Hint: Let op met delen."
-    elif answerGiven == answerOriginal:
-       text = "Jouw antwoord was goed!"
+    question = "%sy + %s = %sy + %s" %(variables[0],variables[1],variables[2],variables[3])
+    answerGiven = float(request.POST['answer'])
+    answerOriginal = float(correct_answer)
+    answerDiv = round(1/answerOriginal,2)
+    if answerGiven == answerOriginal:
+        text = "Jouw antwoord was goed!"
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
+    elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de constanten."
+    elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de x-termen."
+    elif answerGiven == answerDiv:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met delen."
     else:
-       text = "Jouw antwoord was fout. Let goed op de plus- en mintekens."
+       text = "Jouw antwoord was fout." 
+       hint = "Let goed op de plus- en mintekens."
     
-    return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal,'answerDiv':answerDiv, 'text': text})
+    return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
+        'text': text, 'hint': hint, 'question': question})
+
+def module1_1d(request): #nu nog een copy van c.
+    question = {}
+    question["answer"] = random.randint(-20,20)
+    if  question["answer"]==0:
+        question["answer"] = 1
+    left = random.randint(-10,10)
+    right = left*question["answer"]
+    c = random.randint(-20,20)
+    a = left + c
+    b = random.randint(-20,20)
+    d = right + b
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    question["answer_1"] = a - c
+    question["answer_2"] = d - b
+    global correct_answer
+    correct_answer = question["answer"]
+    questions = []
+    questions.append(question)
+
+    return render(request, 'module1/module1_1d.html', {'questions':questions})
+
+def answer1_1d(request): # nu nog een copy van c.
+    question = "%sy + %s = %sy + %s" %(variables[0],variables[1],variables[2],variables[3])
+    answerGiven = float(request.POST['answer'])
+    answerOriginal = float(correct_answer)
+    answerDiv = round(1/answerOriginal,2)
+    if answerGiven == answerOriginal:
+        text = "Jouw antwoord was goed!"
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
+    elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de constanten."
+    elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de x-termen."
+    elif answerGiven == answerDiv:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met delen."
+    else:
+       text = "Jouw antwoord was fout." 
+       hint = "Let goed op de plus- en mintekens."
+    
+    return render(request, 'accounts/answers/answer1_1d.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
+        'text': text, 'hint': hint, 'question': question})
 
 def module1_2(request):
     text = "Wat is het goede antwoord " # % number
