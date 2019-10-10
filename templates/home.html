@@ -6,7 +6,9 @@
 {% block content %}
 {% if user.is_authenticated %}
 <div class="base" style="max-width: 720px;">
-  Hi {{ user.username }}!<br><br><br>
+  Hoi {{ user.username }}!<br><br><br>
+  <form action="{% url 'module1_1' %}"><button>Huidige module</button></form><br><br><br><! this name and url should change depending on the actual module! >
+  <form action="{% url 'moduleOverview' %}"><button>Module overzicht</button></form><br><br><br>
   <form action="{% url 'showInfo' %}"><button>Score</button></form><br><br><br>
   <form action="{% url 'exampleQuestion' %}"><button>New question</button></form><br><br><br>
   <!--<form action="{% url 'logout' %}"><button>Logout</button></form><br><br><br>-->
@@ -27,11 +29,10 @@
 {% else %}
 <div class="base" style="width: 360px">
   <h1>Welcome</h1><br>
-  <p>You are not logged in</p>
-  <form action="{% url 'login' %}"><button>Login</button></form><br><br><br><br><br>
-  If you do not yet have an account<br><br>
-  <form action="{% url 'signup' %}"><button>Sign up</button></form><br>
-</div>
+  <p>Je bent nog niet ingelogd.</p>
+  <form action="{% url 'login' %}"><button>Log in</button></form><br><br><br><br><br>
+  Als je nog geen account hebt:<br><br>
+  <form action="{% url 'signup' %}"><button>Schrijf in</button></form><br>
 {% endif %}
 
 {% endblock %}
