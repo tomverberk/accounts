@@ -17,7 +17,7 @@
   <form action="answer/" method="post">
       {% csrf_token %}
       {{ form }}
-      <p>Antwoord: y = <input type="text" name="answer_1">  </p>
+      <p>Antwoord: y = <input type="text" name="answer">  </p>
       <input type="submit" value="Controleer">  &nbsp;&nbsp;
       <button type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
       

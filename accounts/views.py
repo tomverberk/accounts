@@ -9,6 +9,28 @@ import random, sqlite3, getpass
 from sqlite3 import Error
 #import numpy as np
 
+def signUp(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            
+            users = CustomUser.objects.all()
+            for user in users:
+                if user.username == username:
+                    insertNewUser(user.id)
+                    request.session['username'] = user.id
+
+            return render(request, 'home.html')
+    else:
+        form_class = CustomUserCreationForm
+        success_url = reverse_lazy('login')
+        template_name = 'signup.html'
+        form = CustomUserCreationForm(request.POST)
+    return render(request, 'signup.html', {'form': form})
+
 def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by db_file
@@ -37,7 +59,7 @@ def create_user(conn, user):
     return cur.lastrowid
 
 def insertNewUser(user_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    database = r"C:/MathApp/accounts/db.sqlite3"
  
     # create a database connection
     conn = create_connection(database)
@@ -50,7 +72,7 @@ def insertNewUser(user_id):
             addModule = create_user(conn, user_Module)
 
 def AnswerAnswered(user_id, module_id, correct):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    database = r"C:/MathApp/accounts/db.sqlite3"
  
     # create a database connection
     conn = create_connection(database)
@@ -58,7 +80,6 @@ def AnswerAnswered(user_id, module_id, correct):
     with conn:
         # create a new project
         answerAnsweredCorrect(conn, user_id, module_id, correct)
-
 
 def answerAnsweredCorrect(conn, user_id, module_id, correct):
     user_module = (user_id, module_id)
@@ -104,33 +125,27 @@ def exampleQuestion(request):
     questions.append(question)
     return render(request, 'accounts/exampleQuestion.html', {'questions':questions})
 
-def signUp(request):
+def answer(request):
+    global answer
+    answerGiven = request.POST['answer']
+    answerOriginal = correct_answer
+    print(answerGiven)
+    print(correct_answer)
+    print(answerOriginal)
+    user = request.user
+    module_id = 1
     
-    
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            
-            users = CustomUser.objects.all()
-            for user in users:
-                if user.username == username:
-                    insertNewUser(user.id)
-                    request.session['username'] = user.id
+    if answerGiven == answerOriginal:
+        text = "your answer was correct"
+        AnswerAnswered(user.id, module_id, True)
 
-            return render(request, 'home.html')
     else:
-        form_class = CustomUserCreationForm
-        success_url = reverse_lazy('login')
-        template_name = 'signup.html'
-        form = CustomUserCreationForm(request.POST)
-    return render(request, 'signup.html', {'form': form})
+        text = "your answer was wrong"
+        AnswerAnswered(user.id, module_id, False)
     
-
-
-def moduleOverview(request):     # maybe make this a normal class as well, and just fill the few submodules manually?
+    return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
+    
+def moduleOverview(request): 
    list = ModuleOverview.text
    return render(request, 'moduleOverview.html', {'Hoofdstukken overzicht': list} )
 
@@ -203,8 +218,8 @@ def answer1_1b(request):
 
 def module1_1c(request):
     question = {}
-    question["answer"] = random.randint(-20,20)
-    if question["answer"]==0:
+    question["answer"] = 4 # random.randint(-20,20)
+    if  question["answer"]==0:
         question["answer"] = 1
     left = random.randint(-10,10)
     right = left*question["answer"]
@@ -216,22 +231,25 @@ def module1_1c(request):
     question["answer_1"] = a - c
     question["answer_2"] = d - b
     global correct_answer
-    correct_answer = question["answer"]
+    correct_answer = str(question["answer"])
     questions = []
     questions.append(question)
     
     return render(request, 'module1/module1_1c.html', {'questions':questions})
 
 def answer1_1c(request):
-    #global answer
-    answerGiven = request.POST['answer_1']
+    global answer
+    answerGiven = request.POST['answer']
     answerOriginal = correct_answer
-    if answerGiven == answerOriginal:
-        text = "Jouw antwoord was goed!"
+    answerDiv = str(round(1/float(answerOriginal),2))
+    if answerGiven == answerDiv:
+       text = "Jouw antwoord was fout. Hint: Let op met delen."
+    elif answerGiven == answerOriginal:
+       text = "Jouw antwoord was goed!"
     else:
-        text = "Jouw antwoord was fout."
+       text = "Jouw antwoord was fout. Let goed op de plus- en mintekens."
     
-    return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
+    return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal,'answerDiv':answerDiv, 'text': text})
 
 def module1_2(request):
     text = "Wat is het goede antwoord " # % number
@@ -253,26 +271,6 @@ def module1_exam(request):
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1/module1_exam.html', {'vraag': text} )
 
-
-def answer(request):
-    global answer
-    answerGiven = request.POST['answer']
-    answerOriginal = correct_answer
-    print(answerGiven)
-    print(correct_answer)
-    print(answerOriginal)
-    user = request.user
-    module_id = 1
-    
-    if answerGiven == answerOriginal:
-        text = "your answer was correct"
-        AnswerAnswered(user.id, module_id, True)
-
-    else:
-        text = "your answer was wrong"
-        AnswerAnswered(user.id, module_id, False)
-    
-    return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
 
 def get_answer(request):
     # if this is a POST request we need to process the form data
