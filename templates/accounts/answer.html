@@ -1,20 +1,26 @@
-{% load static %}
+{% extends 'base.html' %}
 
-<html>
-    <head>
-        <title>Django Girls blog</title>
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    </head>
-    <body>
-        NOTHING TO SEE HERE
-        <div>
-                your answer: <br>
-                {{ answerGiven }} <br>
-                correct answer: <br>
-                {{ answerOriginal }} <br>
+{% block content %}
+<div class="base">
+    {{ text }}<br>
+    <br>
+    Your answer: <br>
+    {{ answerGiven }} <br>
+    Correct answer: <br>
+    {{ answerOriginal }} <br><br>
+    <details>
+        <summary>Show hint</summary>
+        <p>This is a hint</p>
+    </details>
+    <br>
+    <form action="{% url 'exampleQuestion' %}"><button>New question</button></form>
+</div>
 
-                {{ text }}
-                
-            </div>
-    </body>
-</html>
+<div class="base" id="right">
+    Score
+    <div id="progressbar">
+        <div></div>
+    </div>
+</div>
+
+{% endblock %}

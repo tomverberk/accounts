@@ -1,21 +1,24 @@
-{% load static %}
+{% extends 'base.html' %}
 
-<html>
-    <head>
-        <title>Django Girls blog</title>
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    </head>
-    <body>
-        <div>
-            {% for question in questions %}
-                {{ question.question }}
-            {% endfor %}
+{% block content %}
+<div>
+    <form class="base" action="answer/" method="post">
+        <h3 style="text-align: left; margin-top: 0">Question name</h3>
+        {% for question in questions %}
+            {{ question.question }}
+        {% endfor %}
+        <br><br>
+        {% csrf_token %}
+        {{ form }}
+        <p><input type="text" name="answer" placeholder="Answer" autocomplete="off"></p>
+        <button>Submit</button>
+    </form>
+
+    <div class="base" id="right">
+        Score
+        <div id="progressbar">
+            <div></div>
         </div>
-        <form action="answer/" method="post">
-            {% csrf_token %}
-            {{ form }}
-            <p>Answer: <input type="text" name="answer"></p>
-            <input type="submit" value="Submit">
-        </form>
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}
