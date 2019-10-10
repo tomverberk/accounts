@@ -25,6 +25,8 @@ urlpatterns = [
     path('module1_1b/answer/', views.answer1_1b, name='answer1_1b'),
     path('module1_1c/', views.module1_1c, name='module1_1c'),
     path('module1_1c/answer/', views.answer1_1c, name='answer1_1c'),
+    path('module1_1d/', views.module1_1d, name='module1_1d'),
+    path('module1_1d/answer/', views.answer1_1d, name='answer1_1d'),
     
     path('module1_2/', views.module1_2, name='module1_2'),
     path('module1_3/', views.module1_3, name='module1_3'),
