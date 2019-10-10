@@ -199,7 +199,7 @@ def answer1_1b(request):
 
 def module1_1c(request):
     question = {}
-    question["answer"] = 4 # random.randint(-20,20)
+    question["answer"] = random.randint(-20,20)
     if  question["answer"]==0:
         question["answer"] = 1
     left = random.randint(-10,10)
