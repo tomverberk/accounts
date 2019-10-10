@@ -68,7 +68,6 @@ class ModuleOverview(models.Model):
     def __str__(self):
         return self.title
 
-
 class SubModule(models.Model): # make a child of Module?
     title = models.CharField(max_length=200)
     text = models.TextField()
