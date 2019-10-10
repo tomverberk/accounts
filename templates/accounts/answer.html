@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="base">
+    {{ text }}<br>
+    <br>
+    Your answer: <br>
+    {{ answerGiven }} <br>
+    Correct answer: <br>
+    {{ answerOriginal }} <br><br>
+    <details>
+        <summary>Show hint</summary>
+        <p>This is a hint</p>
+    </details>
+    <br>
+    <form action="{% url 'exampleQuestion' %}"><button>New question</button></form>
+</div>
+
+<div class="base" id="right">
+    Score
+    <div id="progressbar">
+        <div></div>
+    </div>
+</div>
+
+{% endblock %}

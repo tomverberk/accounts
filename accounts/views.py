@@ -42,7 +42,7 @@ def create_connection(db_file):
         conn = sqlite3.connect(db_file)
     except Error as e:
         print(e)
- 
+
     return conn
 
 def create_user(conn, user):
@@ -52,17 +52,19 @@ def create_user(conn, user):
     :param project:
     :return: project id
     """
-    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5) 
-                                VALUES (?, false, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0) """
+    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5, currentQuestionHints, currentQuestionCorrect)
+                                VALUES (?, false, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0) """
     cur = conn.cursor()
     cur.execute(sql, user)
     return cur.lastrowid
 
 def insertNewUser(user_id):
     database = r"C:/MathApp/accounts/db.sqlite3"
- 
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+
     # create a database connection
     conn = create_connection(database)
+    print('ahhhhh')
 
     modules = Module.objects.all()
     for module in modules:
@@ -70,44 +72,43 @@ def insertNewUser(user_id):
             # create a new project
             user_Module = (user_id, module.id)
             addModule = create_user(conn, user_Module)
-
-def AnswerAnswered(user_id, module_id, correct):
-    database = r"C:/MathApp/accounts/db.sqlite3"
  
+def AnswerAnswered(user_id, module_id, correct, hintsUsed):
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
 
     with conn:
         # create a new project
-        answerAnsweredCorrect(conn, user_id, module_id, correct)
+            answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed)
 
-def answerAnsweredCorrect(conn, user_id, module_id, correct):
+def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed):
     user_module = (user_id, module_id)
     if correct:
-        sql_request = 'SELECT amountCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        sql_request_amount = 'SELECT amountCorrect, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
     else:
-        sql_request = 'SELECT amountWrong FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
 
     cur = conn.cursor()
-    
-    cur.execute(sql_request, user_module)
+    cur.execute(sql_request_amount, user_module)
     records = cur.fetchall()
-    print(user_id)
-    print(module_id)
-    print(records)
-    record = records[0][0]+1
-    newcorrect = [record, user_id, module_id]
+    if(correct):
+        newCurrentQuestionCorrect = records[0][3]+1
+    else:
+        newCurrentQuestionCorrect = records[0][3]
+    newAmountHints = records[0][1]+hintsUsed
+    newcurrentQuestionHints = records[0][2]+hintsUsed
+    newAmountCorrect_Wrong = records[0][0]+1
+    newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, user_id, module_id]
 
     if correct:
-        sql = 'UPDATE accounts_module_user SET amountCorrect = ? WHERE user_id = ? AND module_id = ?'
+        sql = 'UPDATE accounts_module_user SET amountCorrect = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ? WHERE user_id = ? AND module_id = ?'
     else:
-        sql = 'UPDATE accounts_module_user SET amountWrong = ? WHERE user_id = ? AND module_id = ?'
+        sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ? WHERE user_id = ? AND module_id = ?'
 
     cur = conn.cursor()
     cur.execute(sql,newcorrect)
-    print(user_module)
-    print('check')
-    
 
 def showInfo(request):
 #    generateIntelligence = generateIntelligence.objects.all()
@@ -117,7 +118,7 @@ def exampleQuestion(request):
     question = {}
     a = random.randint(1,101)
     b = random.randint(1,101)
-    question["question"] = "%s + %s =" %(a,b)  
+    question["question"] = "%s + %s =" %(a,b)
     question["answer"] = "%s" %(a+b)
     global correct_answer
     correct_answer = question["answer"]
@@ -125,27 +126,26 @@ def exampleQuestion(request):
     questions.append(question)
     return render(request, 'accounts/exampleQuestion.html', {'questions':questions})
 
-def answer(request):
-    global answer
-    answerGiven = request.POST['answer']
-    answerOriginal = correct_answer
-    print(answerGiven)
-    print(correct_answer)
-    print(answerOriginal)
-    user = request.user
-    module_id = 1
-    
-    if answerGiven == answerOriginal:
-        text = "your answer was correct"
-        AnswerAnswered(user.id, module_id, True)
+def signUp(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
 
-    else:
-        text = "your answer was wrong"
-        AnswerAnswered(user.id, module_id, False)
-    
-    return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
-    
-def moduleOverview(request): 
+            users = CustomUser.objects.all()
+            for user in users:
+                if user.username == username:
+                    insertNewUser(user.id)
+                    request.session['username'] = user.id
+                    form_class = CustomUserCreationForm
+                    success_url = reverse_lazy('login')
+                    template_name = 'signup.html'
+                    form = CustomUserCreationForm(request.POST)
+    return render(request, 'signup.html', {'form': form})
+
+def moduleOverview(request):     # maybe make this a normal class as well, and just fill the few submodules manually?
    list = ModuleOverview.text
    return render(request, 'moduleOverview.html', {'Hoofdstukken overzicht': list} )
 
@@ -166,13 +166,13 @@ def module1_1a(request):
     d = random.randint(-3,3)
     question["question"] = "%sx + %s + %sx + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
     question["answer_1"] = "%s" %(a+c)
-    question["answer_2"] = "%s"  %(b+d) 
+    question["answer_2"] = "%s"  %(b+d)
     question["answer"] = question["answer_1"], question["answer_2"]
     global correct_answer
     correct_answer = question["answer"]
     questions = []
     questions.append(question)
-    
+
     return render(request, 'module1/module1_1a.html', {'questions':questions})
 
 def answer1_1a(request):
@@ -183,7 +183,7 @@ def answer1_1a(request):
         text = "Jouw antwoord was goed!"
     else:
         text = "Jouw antwoord was fout."
-    
+
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
         'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text})
 
@@ -195,13 +195,13 @@ def module1_1b(request):
     d = random.randint(-5,5)
     question["question"] = "%sx + %s = %sx + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
     question["answer_1"] = "%s" %(a-c)
-    question["answer_2"] = "%s" %(d-b) 
+    question["answer_2"] = "%s" %(d-b)
     question["answer"] = question["answer_1"], question["answer_2"]
     global correct_answer
     correct_answer = question["answer"]
     questions = []
     questions.append(question)
-    
+
     return render(request, 'module1/module1_1b.html', {'questions':questions})
 
 def answer1_1b(request):
@@ -212,7 +212,7 @@ def answer1_1b(request):
         text = "Jouw antwoord was goed!"
     else:
         text = "Jouw antwoord was fout."
-    
+
     return render(request, 'accounts/answers/answer1_1b.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
         'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text})
 
@@ -234,7 +234,7 @@ def module1_1c(request):
     correct_answer = str(question["answer"])
     questions = []
     questions.append(question)
-    
+
     return render(request, 'module1/module1_1c.html', {'questions':questions})
 
 def answer1_1c(request):
@@ -271,6 +271,25 @@ def module1_exam(request):
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1/module1_exam.html', {'vraag': text} )
 
+def answer(request):
+    global answer
+    answerGiven = request.POST['answer']
+    answerOriginal = correct_answer
+    print(answerGiven)
+    print(correct_answer)
+    print(answerOriginal)
+    user = request.user
+    module_id = 1
+
+    if answerGiven == answerOriginal:
+        text = "your answer was correct"
+        AnswerAnswered(user.id, module_id, True, 0)
+
+    else:
+        text = "your answer was wrong"
+        AnswerAnswered(user.id, module_id, False, 0)
+
+    return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
 
 def get_answer(request):
     # if this is a POST request we need to process the form data
@@ -279,11 +298,10 @@ def get_answer(request):
         form = AnswerForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            
+
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-
 
             return HttpResponse('/thanks/')
 

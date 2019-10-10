@@ -5,25 +5,34 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-  Hoi {{ user.username }}!
-  
-  <p> Je huidige module: 
-  <a href="{% url 'module1_1' %}"> Hoofdstuk 1.1 </a> <! this name and url should change depending on the actual module! > </p>
+<div class="base" style="max-width: 720px;">
+  Hoi {{ user.username }}!<br><br><br>
+  <form action="{% url 'module1_1' %}"><button>Huidige module</button></form><br><br><br><! this name and url should change depending on the actual module! >
+  <form action="{% url 'moduleOverview' %}"><button>Module overzicht</button></form><br><br><br>
+  <form action="{% url 'showInfo' %}"><button>Score</button></form><br><br><br>
+  <form action="{% url 'exampleQuestion' %}"><button>New question</button></form><br><br><br>
+  <!--<form action="{% url 'logout' %}"><button>Logout</button></form><br><br><br>-->
+  <chaptergrid>
+  <form action="hoofdstuk1.html">
+    <chapter style="float:left">Hoofdstuk 1</chapter>
+  </form>
 
-  <p> Kies zelf een module uit het overzicht:
-  <a href="{% url 'moduleOverview' %}"> Module overzicht </a> </p>
+  <form action="hoofdstuk1.html">
+    <chapter style="float:none">Hoofdstuk 2</chapter>
+  </form>
 
-  <p>Bekijk hier je scores:
-  <a href="{% url 'showInfo' %}">database info</a> <! andere naam? > </p>
-
-  <p><a href="{% url 'logout' %}">Log uit</a></p>
-
-  Press here to answer a question
-  <a href="{% url 'exampleQuestion' %}">Example question</a>
+  <form action="hoofdstuk1.html">
+    <chapter style="float:right">Hoofdstuk 3</chapter>
+  </form>
+  </chaptergrid>
+</div>
 {% else %}
+<div class="base" style="width: 360px">
+  <h1>Welcome</h1><br>
   <p>Je bent nog niet ingelogd.</p>
-  <a href="{% url 'login' %}">Log in</a><br><br>
-  Als je nog geen account hebt:
-  <a href="{% url 'signup' %}"> Schrijf in</a>
+  <form action="{% url 'login' %}"><button>Log in</button></form><br><br><br><br><br>
+  Als je nog geen account hebt:<br><br>
+  <form action="{% url 'signup' %}"><button>Schrijf in</button></form><br>
 {% endif %}
+
 {% endblock %}
