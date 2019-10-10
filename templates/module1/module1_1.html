@@ -1,17 +1,11 @@
-<!-- templates/base.html -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>{% block title %} Paragraaf 1.1  {% endblock %}</title>
-</head>
-<body>
-  <main>
-    {% block content %}
-    <p> <a href="{% url 'module1_1a' %}"> Klik hier voor vraag 1  </a> <! this name and url should change depending on the actual module! >
+{% extends 'base.html' %}
 
-    <! Klik hier voor het vragen-overzicht: > </p>
-    {% endblock %}
-  </main>
-</body>
-</html>
+{% block title %}Paragraaf 1.1{% endblock %}
+
+{% block content %}
+<div class="base">
+    <form action="{% url 'module1_1a' %}"><button>Klik hier voor vraag 1</button></form><!--this name and url should change depending on the actual module!-->
+
+    <!--Klik hier voor het vragen-overzicht:-->
+</div>
+{% endblock %}

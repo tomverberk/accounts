@@ -1,14 +1,9 @@
-<!-- templates/base.html -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>{% block title %} Module 1.1  {% endblock %}</title>
-</head>
-<body>
-  <main>
-    {% block content %}
-    {% endblock %}
-  </main>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Module 1.3{% endblock %}
+
+{% block content %}
+<div class="base">
+1.3
+</div>
+{% endblock %}

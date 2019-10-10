@@ -1,28 +1,22 @@
-<!-- templates/base.html -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>{% block title %} Hoofdstuk 1.1, vraag 1 {% endblock %}</title>
-</head>
-<body>
-  <main>
-    {% block content %}
-    <p> Herleid </p>
-    <div>
-      {% for question in questions %}
-          {{ question.question }}
-      {% endfor %}
+{% extends 'base.html' %}
+
+{% block title %}Hoofdstuk 1.1, vraag 1{% endblock %}
+
+{% block content %}
+<div class="base">
+  <h4> Herleid </h4>
+  <div>
+    {% for question in questions %}
+        {{ question.question }}
+    {% endfor %}
   </div>
   <form action="answer/" method="post">
-      {% csrf_token %}
-      {{ form }}
-      <p>Antwoord: <input type="number" name="answer_1"> x + <input type="number" name="answer_2"> </p>
-      <input type="submit" value="Controleer">  &nbsp;&nbsp;
-      <button type="button" onClick="window.location.reload();"> Nieuwe vraag </button> &nbsp;&nbsp;
-      
+    {% csrf_token %}
+    {{ form }}
+    <p>Antwoord:<br><br><input style="width: 120px;" type="number" name="answer_1"> x + <input style="width: 120px;" type="number" name="answer_2"> </p>
+    <button type="submit">Controleer</button>   &nbsp;&nbsp;
+    <br><br>
+    <button type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
   </form>  
-    {% endblock %}
-  </main>
-</body>
-</html>
+</div>
+{% endblock %}
