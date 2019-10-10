@@ -3,7 +3,10 @@
         <title></title>
     </head>
     <body>
-        
+            <div>
+            Vraag: {{ question }}
+            </div>
+            <br>        
             <div>
                 Jouw antwoord: <br>
                 y = {{answerGiven}}
@@ -11,17 +14,28 @@
                 Het juiste antwoord: <br>
                 y = {{answerOriginal}}
                 <br><br>
-                #{{answerDiv}}
-                <br><br>
                 {{ text }}
                 <br><br>
-                <button type="button" onclick="alert('Let goed op de plus- en mintekens!')"> Hint </button> &nbsp;&nbsp;
-                
+                <button type="button" onclick="showHint()"> Bekijk een hint </button> &nbsp;&nbsp;
                 <a href="{% url 'module1_1c' %}"> Doe deze vraag opnieuw </a> &nbsp;&nbsp;
                 
                 <! change below to +1 when done >
-                <a href="{% url 'module1_1b' %}"> Volgende vraag </a> 
+                <a href="{% url 'module1_1c' %}"> Volgende vraag </a> 
             
             </div>
+            <br>
+            <div id="showHint" style="display: none;">
+                Hint: {{hint}}
+            </div>
+            <script>
+                function showHint() {
+                    var x = document.getElementById("showHint");
+                    if (x.style.display === "none") {
+                      x.style.display = "block";
+                    } else {
+                      x.style.display = "none";
+                    }
+                  }
+            </script>
     </body>
 </html>
