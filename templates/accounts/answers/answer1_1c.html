@@ -1,27 +1,21 @@
-<html>
-    <head>
-        <title></title>
-    </head>
-    <body>
-        
-            <div>
-                Jouw antwoord: <br>
-                y = {{answerGiven}}
-                <br><br>
-                Het juiste antwoord: <br>
-                y = {{answerOriginal}}
-                <br><br>
-                #{{answerDiv}}
-                <br><br>
-                {{ text }}
-                <br><br>
-                <button type="button" onclick="alert('Let goed op de plus- en mintekens!')"> Hint </button> &nbsp;&nbsp;
-                
-                <a href="{% url 'module1_1c' %}"> Doe deze vraag opnieuw </a> &nbsp;&nbsp;
-                
-                <! change below to +1 when done >
-                <a href="{% url 'module1_1b' %}"> Volgende vraag </a> 
-            
-            </div>
-    </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+<div class="base">
+    Jouw antwoord: <br>
+    y = {{answerGiven}}
+    <br><br>
+    Het juiste antwoord: <br>
+    y = {{answerOriginal}}
+    <br><br>
+    {{ text }}
+    <br><br>
+    <button type="button" onclick="alert('Let goed op de plus- en mintekens!')"> Hint </button> &nbsp;&nbsp;<br><br>
+    <form action="{% url 'module1_1c' %}"><button>Doe deze vraag opnieuw</button></form><br>
+
+    <! change below to +1 when done >
+    <form action="{% url 'module1_1b' %}"><button>Volgende vraag</button></form><br>
+</div>
+{% endblock %}
