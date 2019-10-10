@@ -126,25 +126,6 @@ def exampleQuestion(request):
     questions.append(question)
     return render(request, 'accounts/exampleQuestion.html', {'questions':questions})
 
-def signUp(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-
-            users = CustomUser.objects.all()
-            for user in users:
-                if user.username == username:
-                    insertNewUser(user.id)
-                    request.session['username'] = user.id
-                    form_class = CustomUserCreationForm
-                    success_url = reverse_lazy('login')
-                    template_name = 'signup.html'
-                    form = CustomUserCreationForm(request.POST)
-    return render(request, 'signup.html', {'form': form})
-
 def moduleOverview(request):     # maybe make this a normal class as well, and just fill the few submodules manually?
    list = ModuleOverview.text
    return render(request, 'moduleOverview.html', {'Hoofdstukken overzicht': list} )
@@ -182,7 +163,7 @@ def answer1_1a(request):
     if answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
     else:
-        text = "Jouw antwoord was fout."
+        text = "Jouw antwoord was fout. Let goed op de plus- en mintekens."
 
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
         'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text})
