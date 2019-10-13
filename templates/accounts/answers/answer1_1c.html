@@ -17,7 +17,9 @@
                 <a href="{% url 'module1_1c' %}"> Doe deze vraag opnieuw </a> &nbsp;&nbsp;
                 
                 <! change below to +1 when done >
-                <a href="{% url 'module1_1b' %}"> Volgende vraag </a> 
+                {% if nextQuestionPossible %}
+                <a href="{% url 'module1_2_from_module1_1c' %}"> Volgende vraag </a> 
+                {% endif %}
             
             </div>
     </body>

@@ -14,7 +14,7 @@
           {{ question.question }}
       {% endfor %}
   </div>
-  <form action="answer/" method="post">
+  <form action="/accounts/module1_1c/answer/" method="post">
       {% csrf_token %}
       {{ form }}
       <p>Antwoord: y = <input type="text" name="answer_1">  </p>
