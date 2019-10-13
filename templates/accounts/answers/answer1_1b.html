@@ -14,7 +14,9 @@
     <br><br>
     {{ text }}
     <br><br>
-    <form action="{% url 'module1_1c' %}"><button>Volgende vraag</button></form><br><br>
+    {% if nextQuestionPossible %}
+                <a href="{% url 'module1_1c_from_module1_1b' %}"> Volgende vraag </a> 
+                {% endif %}
     <form action="{% url 'module1_1b' %}"><button>Doe deze vraag opnieuw</button></form><br><br>
     <button type="button" onclick="showHint()"> Bekijk een hint </button> &nbsp;&nbsp;<br><br>
         <div id="showHint" style="display: none;" class="base">
