@@ -9,6 +9,28 @@ import random, sqlite3, getpass
 from sqlite3 import Error
 #import numpy as np
 
+def signUp(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            
+            users = CustomUser.objects.all()
+            for user in users:
+                if user.username == username:
+                    insertNewUser(user.id)
+                    request.session['username'] = user.id
+
+            return render(request, 'home.html')
+    else:
+        form_class = CustomUserCreationForm
+        success_url = reverse_lazy('login')
+        template_name = 'signup.html'
+        form = CustomUserCreationForm(request.POST)
+    return render(request, 'signup.html', {'form': form})
+
 def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by db_file
@@ -37,7 +59,8 @@ def create_user(conn, user):
     return cur.lastrowid
 
 def insertNewUser(user_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    database = r"C:/MathApp/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
     conn = create_connection(database)
@@ -49,10 +72,10 @@ def insertNewUser(user_id):
             # create a new project
             user_Module = (user_id, module.id)
             addModule = create_user(conn, user_Module)
-
+ 
 def AnswerAnswered(user_id, module_id, correct, hintsUsed):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
-
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
 
@@ -60,14 +83,12 @@ def AnswerAnswered(user_id, module_id, correct, hintsUsed):
         # create a new project
             answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed)
 
-
 def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed):
     user_module = (user_id, module_id)
     if correct:
         sql_request_amount = 'SELECT amountCorrect, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
     else:
         sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
-
 
     cur = conn.cursor()
     cur.execute(sql_request_amount, user_module)
@@ -148,9 +169,11 @@ def module1_1a(request):
     b = random.randint(-20,20)
     c = random.randint(-20,20)
     d = random.randint(-3,3)
-    question["question"] = "%sx + %s + %sx + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sx + %s + %sx + %s" %(a,b,c,d) 
     question["answer_1"] = "%s" %(a+c)
-    question["answer_2"] = "%s"  %(b+d)
+    question["answer_2"] = "%s" %(b+d)
     question["answer"] = question["answer_1"], question["answer_2"]
     global correct_answer
     correct_answer = question["answer"]
@@ -198,20 +221,34 @@ def ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id):
        
 
 def answer1_1a(request):
-    #global answer
+    question = "%sx + %s + %sx + %s" %(variables[0],variables[1],variables[2],variables[3])
     answerGiven = request.POST['answer_1'], request.POST['answer_2']
     answerOriginal = correct_answer
     user = request.user
-    if answerGiven == answerOriginal:
+    if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint = "De x-termen én constanten zijn niet goed bij elkaar opgeteld."
+        AnswerAnswered(user.id, 1, False, 0)
+    elif  answerGiven[0] != answerOriginal[0]:
+        text = "Jouw antwoord was fout."
+        hint = "De x-termen zijn niet goed opgeteld."
+        AnswerAnswered(user.id, 1, False, 0)
+    elif answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint = "De constanten zijn niet goed opgeteld."
+        AnswerAnswered(user.id, 1, False, 0)
+    elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         AnswerAnswered(user.id, 1, True, 0)
     else:
         text = "Jouw antwoord was fout."
+        hint = "Let goed op de plus- en mintekens."
         AnswerAnswered(user.id, 1, False, 0)
-
+    
     nextQuestionPossible = IsNextQuestionPossible(user.id, 1)
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question 'nextQuestionPossible':nextQuestionPossible})
 
 def module1_1b(request):
     question = {}
@@ -219,7 +256,9 @@ def module1_1b(request):
     b = random.randint(-20,20)
     c = random.randint(-20,20)
     d = random.randint(-5,5)
-    question["question"] = "%sx + %s = %sx + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sx + %s = %sx + %s" %(a,b,c,d)  
     question["answer_1"] = "%s" %(a-c)
     question["answer_2"] = "%s" %(d-b)
     question["answer"] = question["answer_1"], question["answer_2"]
@@ -249,24 +288,38 @@ def module1_1b_from_module1_1a(request):
     return render(request, 'module1/module1_1b.html', {'questions':questions})
 
 def answer1_1b(request):
-    #global answer
+    question = "%sx + %s = %sx + %s" %(variables[0],variables[1],variables[2],variables[3])
     answerGiven = request.POST['answer_1'], request.POST['answer_2']
     answerOriginal = correct_answer
-    if answerGiven == answerOriginal:
+    if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint = "Tel de x-termen goed op aan de linkerzijde. Tel de constanten goed op aan de rechterzijde. Let goed op plus- en mintekens."
+        AnswerAnswered(request.user.id, 1, False, 0)
+    elif answerGiven[0] != answerOriginal[0]:
+        text = "Jouw antwoord was fout."
+        hint = "De linkerzijde heeft niet (alleen) het goede aantal x-termen. Let goed op plus- en mintekens."
+        AnswerAnswered(request.user.id, 1, False, 0)
+    elif answerGiven[1] != answerOriginal[1]:
+        text = "Jouw antwoord was fout."
+        hint =  "De rechterzijde heeft niet de goede waarde, de constanten zijn niet goed opgeteld. Let goed op plus- en mintekens."
+        AnswerAnswered(request.user.id, 1, False, 0)
+    elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         AnswerAnswered(request.user.id, 1, True, 0)
     else:
         text = "Jouw antwoord was fout."
         AnswerAnswered(request.user.id, 1, False, 0)
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+
 
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     return render(request, 'accounts/answers/answer1_1b.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question 'nextQuestionPossible':nextQuestionPossible})
 
 def module1_1c(request):
     question = {}
     question["answer"] = random.randint(-20,20)
-    if question["answer"]==0:
+    if  question["answer"]==0:
         question["answer"] = 1
     left = random.randint(-10,10)
     right = left*question["answer"]
@@ -274,7 +327,9 @@ def module1_1c(request):
     a = left + c
     b = random.randint(-20,20)
     d = right + b
-    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)
     question["answer_1"] = a - c
     question["answer_2"] = d - b
     global correct_answer
@@ -307,18 +362,87 @@ def module1_1c_from_module1_1b(request):
     return render(request, 'module1/module1_1c.html', {'questions':questions})
 
 def answer1_1c(request):
-    #global answer
-    answerGiven = request.POST['answer_1']
-    answerOriginal = correct_answer
+    question = "%sy + %s = %sy + %s" %(variables[0],variables[1],variables[2],variables[3])
+    answerGiven = float(request.POST['answer'])
+    answerOriginal = float(correct_answer)
+    answerDiv = round(1/answerOriginal,2)
     if answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         AnswerAnswered(request.user.id, 1, True, 0)
-    else:
+    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
+        hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
         AnswerAnswered(request.user.id, 1, False, 0)
-
+    elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de constanten."
+        AnswerAnswered(request.user.id, 1, False, 0)
+    elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de x-termen."
+        AnswerAnswered(request.user.id, 1, False, 0)
+    elif answerGiven == answerDiv:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met delen."
+        AnswerAnswered(request.user.id, 1, False, 0)
+    else:
+       text = "Jouw antwoord was fout." 
+       hint = "Let goed op de plus- en mintekens."
+    
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
-    return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text, 'nextQuestionPossible':nextQuestionPossible})
+    return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
+        'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
+
+def module1_1d(request): #nu nog een copy van c.
+    question = {}
+    question["answer"] = random.randint(-20,20)
+    if  question["answer"]==0:
+        question["answer"] = 1
+    left = random.randint(-10,10)
+    right = left*question["answer"]
+    c = random.randint(-20,20)
+    a = left + c
+    b = random.randint(-20,20)
+    d = right + b
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    question["answer_1"] = a - c
+    question["answer_2"] = d - b
+    global correct_answer
+    correct_answer = question["answer"]
+    questions = []
+    questions.append(question)
+
+    return render(request, 'module1/module1_1d.html', {'questions':questions})
+
+def answer1_1d(request): # nu nog een copy van c.
+    question = "%sy + %s = %sy + %s" %(variables[0],variables[1],variables[2],variables[3])
+    answerGiven = float(request.POST['answer'])
+    answerOriginal = float(correct_answer)
+    answerDiv = round(1/answerOriginal,2)
+    if answerGiven == answerOriginal:
+        text = "Jouw antwoord was goed!"
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
+    elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de constanten."
+    elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
+        text = "Jouw antwoord was fout."
+        hint = "Let goed op met het optellen of aftrekken van de x-termen."
+    elif answerGiven == answerDiv:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met delen."
+    else:
+       text = "Jouw antwoord was fout." 
+       hint = "Let goed op de plus- en mintekens."
+    
+    return render(request, 'accounts/answers/answer1_1d.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
+        'text': text, 'hint': hint, 'question': question})
 
 def module1_2(request):
     text = "Wat is het goede antwoord " # % number
@@ -344,7 +468,6 @@ def module1_5(request):
 def module1_exam(request):
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1/module1_exam.html', {'vraag': text} )
-
 
 def answer(request):
     global answer
@@ -377,7 +500,6 @@ def get_answer(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-
 
             return HttpResponse('/thanks/')
 
