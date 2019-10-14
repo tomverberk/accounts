@@ -3,7 +3,7 @@
 {% block title %}Title{% endblock %}
 
 {% block content %}
-<div class="base">
+<div class="base" {% if correct == 1 %} style="border-top: 10px solid rgb(41, 180, 41);" {% endif %}>
     Jouw antwoord: <br>
     {{answerGiven_1}}x + {{answerGiven_2}}
     <br><br>
