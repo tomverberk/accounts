@@ -229,6 +229,8 @@ def module1_1c(request):
     if  question["answer"]==0:
         question["answer"] = 1
     left = random.randint(-10,10)
+    if  left==0:
+        left = 1
     right = left*question["answer"]
     c = random.randint(-20,20)
     a = left + c
@@ -279,14 +281,38 @@ def module1_1d(request): #nu nog een copy van c.
     if  question["answer"]==0:
         question["answer"] = 1
     left = random.randint(-10,10)
+    if  left == 0:
+        left = 1:
     right = left*question["answer"]
-    c = random.randint(-20,20)
-    a = left + c
+    #b,e,h,k : a + (bx+c). one becomes zero, another becomes varied
+    b = 1
+    e = 1
+    h = 1
+    k = 1
+    bracket = random.randint(1,4)
+    if   bracket ==1:
+        b = random.randint(-3,3) and h == 0
+    elif bracket ==2:
+        e = random.randint(-3,3) and k == 0
+    elif bracket ==3:
+        h = random.randint(-3,3) and e == 0
+    elif bracket ==4:
+        k = random.randint(-3,3) and b == 0
+    #c,f,g,i : constants in brackets
+    c = random.randint(-10,10)
+    f = random.randint(-20,20)
+    g = random.randint(-10,10)
+    i = random.randint(-20,20)
+    #a,d,g,j: constants before brackets
+    d = random.randint(-20,20)
+    j = random.randint(-20,20)
+    a = left - d*e + g*h + j*k
     b = random.randint(-20,20)
-    d = right + b
+    j = right + 
+    
     global variables
     variables = [a,b,c,d]
-    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    question["question"] = "%s(%st + %s) + %s(%st + %s)  = %s(%st + %s) + %s(%st + %s) " %(a,b,c,d,e,f,g,h,i,j,k,l)  #vary which terms have 'x'? # vary name 'x', # +- = -
     question["answer_1"] = a - c
     question["answer_2"] = d - b
     global correct_answer
