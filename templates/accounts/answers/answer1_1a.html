@@ -4,16 +4,34 @@
 
 {% block content %}
 <div class="base">
-    Jouw antwoord: <br>
-    {{answerGiven_1}}x + {{answerGiven_2}}
-    <br><br>
-    Het juiste antwoord: <br>
-    {{answerOriginal_1}}x + {{answerOriginal_2}}
-    <br><br>
-    {{ text }}
-    <br><br>
-    <button type="button" onclick="alert('Let goed op de plus- en mintekens!')"> Hint </button> &nbsp;&nbsp;<br><br>
-    <form action="{% url 'module1_1a' %}"><button>Doe deze vraag opnieuw</button></form><br>
-    <form action="{% url 'module1_1b' %}"><button>Volgende vraag</button></form><br>
+  Vraag: {{ question }}
+  <br><br>
+  Jouw antwoord: <br>
+  {{answerGiven_1}}x + {{answerGiven_2}}
+  <br><br>
+  Het juiste antwoord: <br>
+  {{answerOriginal_1}}x + {{answerOriginal_2}}
+  <br><br>
+  {{ text }}
+  <br><br>
+  {% if nextQuestionPossible %}
+                <a href="{% url 'module1_1b_from_module1_1a' %}"> Volgende vraag </a>
+  {% endif %}
+  <form action="{% url 'module1_1a' %}"><button>Doe deze vraag opnieuw</button></form><br><br>
+  <button type="button" onclick="showHint()"> Bekijk een hint </button><br><br>
+    <div id="showHint" style="display: none;" class="base">
+     <b> Hint </b> : {{hint}}
+    </div>
 </div>
+
+<script>
+    function showHint() {
+        var x = document.getElementById("showHint");
+        if (x.style.display === "none") {
+          x.style.display = "block";
+        } else {
+          x.style.display = "none";
+        }
+      }
+  </script>
 {% endblock %}
