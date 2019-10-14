@@ -4,7 +4,7 @@
   position: relative;
   z-index: 1;
   background: #fafafa;
-  max-width: 480px;
+  max-width: 360px;
   margin: 0 auto 100px;
   margin-top: 100px;
   padding: 25px;
@@ -42,7 +42,7 @@
   font-family: "Roboto", sans-serif;
   outline: 0;
   background-color: DodgerBlue;
-  width: 45%;
+  width: 60%;
   border: 0;
   padding: 12px;
   color: #FFFFFF;
@@ -145,8 +145,7 @@ body {
   -moz-osx-font-smoothing: grayscale;  
 }
 
-ul.navigationbar {
-  z-index: 2;
+ul {
   position: fixed;
   top: 0;
   left: 0;
@@ -190,39 +189,4 @@ li a:hover {
   /* Adjust with JavaScript */
   height: 20px;
   border-radius: 10px;
-}
-
-.errornote {
-  font-size: 14px;
-  font-weight: 700;
-  display: block;
-  padding: 10px 12px;
-  margin: 0 0 10px 0;
-  color: #ba2121;
-  border: 1px solid #ba2121;
-  border-radius: 4px;
-  background-color: #fff;
-  background-position: 5px 12px;
-}
-
-ul.errorlist {
-  margin: 0 0 4px;
-  padding: 0;
-  color: #ba2121;
-  background: #fff;
-}
-
-ul.errorlist li {
-  font-size: 13px;
-  display: block;
-  margin-bottom: 4px;
-}
-
-ul.errorlist li:first-child {
-  margin-top: 0;
-}
-
-ul.errorlist li a {
-  color: inherit;
-  text-decoration: underline;
 }

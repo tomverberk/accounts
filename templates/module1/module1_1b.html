@@ -14,9 +14,9 @@
     {% csrf_token %}
     {{ form }}
     <p>Antwoord: <br><br> <input style="width: 120px;" type="number" name="answer_1"> x = <input style="width: 120px;" type="number" name="answer_2"> </p>
-    <button style="float: right;" type="submit">Controleer</button>
-    <button style="float: left;"type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
+    <button type="submit">Controleer</button>   &nbsp;&nbsp;
     <br><br>
+    <button type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
   </form>  
 </div>
 {% endblock %}

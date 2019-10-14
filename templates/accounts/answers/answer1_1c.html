@@ -12,10 +12,10 @@
     <br><br>
     {{ text }}
     <br><br>
-    <button type="button" onclick="alert('Let goed op de plus- en mintekens!')"> Hint </button><br><br>
-    <form action="{% url 'module1_1c' %}"><button style="float: left;">Doe deze vraag opnieuw</button></form>
+    <button type="button" onclick="alert('Let goed op de plus- en mintekens!')"> Hint </button> &nbsp;&nbsp;<br><br>
+    <form action="{% url 'module1_1c' %}"><button>Doe deze vraag opnieuw</button></form><br>
 
     <! change below to +1 when done >
-    <form action="{% url 'module1_1b' %}"><button style="float: right;">Volgende vraag</button></form><br><br>
+    <form action="{% url 'module1_1b' %}"><button>Volgende vraag</button></form><br>
 </div>
 {% endblock %}
