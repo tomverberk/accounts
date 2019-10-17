@@ -7,6 +7,8 @@ from .models import CustomUser, ModuleOverview, Module, SubModule, Exam
 from .forms import AnswerForm, CustomUserCreationForm, CustomUserChangeForm
 import random, sqlite3, getpass
 from sqlite3 import Error
+#import numpy as np
+database = r"db.sqlite3"
 
 def signUp(request):
     if request.method == 'POST':
@@ -59,7 +61,7 @@ def create_user(conn, user):
 
 def insertNewUser(user_id):
     #database = r"C:/MathApp/accounts/db.sqlite3"
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
     conn = create_connection(database)
@@ -72,39 +74,79 @@ def insertNewUser(user_id):
             user_Module = (user_id, module.id)
             addModule = create_user(conn, user_Module)
  
-def AnswerAnswered(user_id, module_id, correct, hintsUsed):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+def AnswerAnswered(user_id, module_id, correct, hintsUsed, mistakeNr):
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
     #database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
 
     with conn:
         # create a new project
-            answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed)
+            answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed, mistakeNr)
 
-def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed):
+def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed, mistakeNr):
     user_module = (user_id, module_id)
     if correct:
-        sql_request_amount = 'SELECT amountCorrect, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        sql_request_amount = 'SELECT amountCorrect, amountHints, currentQuestionHints, currentQuestionCorrect, mistake1 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
     else:
-        sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        if mistakeNr == 1:
+            sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect, mistake1 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 2:
+            sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect, mistake2 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 3:
+            sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect, mistake3 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 4:
+            sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect, mistake4 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 5:
+            sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect, mistake5 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 6:
+            sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect, mistake1, mistake2 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+        else:
+            sql_request_amount = 'SELECT amountWrong, amountHints, currentQuestionHints, currentQuestionCorrect, mistake1 FROM accounts_module_user WHERE user_id = ? AND module_id = ?'
+
 
     cur = conn.cursor()
     cur.execute(sql_request_amount, user_module)
     records = cur.fetchall()
     if(correct):
         newCurrentQuestionCorrect = records[0][3]+1
+        newMistakeX = records[0][4]
     else:
         newCurrentQuestionCorrect = records[0][3]
+        if mistakeNr == 0:
+            newMistakeX = records[0][4]
+        else:
+            newMistakeX = records[0][4]+1
     newAmountHints = records[0][1]+hintsUsed
     newcurrentQuestionHints = records[0][2]+hintsUsed
     newAmountCorrect_Wrong = records[0][0]+1
-    newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, user_id, module_id]
+    if correct:
+        newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, user_id, module_id]
+    elif mistakeNr == 6:
+        newMistakeY = records[0][5]+1
+        newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, newMistakeX, newMistakeY, user_id, module_id]
+    else:
+        newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, newMistakeX, user_id, module_id]
 
     if correct:
         sql = 'UPDATE accounts_module_user SET amountCorrect = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ? WHERE user_id = ? AND module_id = ?'
     else:
-        sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ? WHERE user_id = ? AND module_id = ?'
+        if mistakeNr == 1:
+            sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake1 = ? WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 2:
+            sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake2 = ? WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 3:
+            sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake3 = ? WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 4:
+            sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake4 = ? WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 5:
+            sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake5 = ? WHERE user_id = ? AND module_id = ?'
+        elif mistakeNr == 6:
+            print(mistakeNr)
+            print(correct)
+            sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake1 = ?, mistake2 = ? WHERE user_id = ? AND module_id = ?'
+        else:
+            sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake1 = ? WHERE user_id = ? AND module_id = ?'
 
     cur = conn.cursor()
     cur.execute(sql,newcorrect)
@@ -182,7 +224,7 @@ def module1_1a(request):
     return render(request, 'module1/module1_1a.html', {'questions':questions})
 
 def IsNextQuestionPossible(user_id, module_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
     conn = create_connection(database)
@@ -201,7 +243,7 @@ def IsNextQuestionPossible(user_id, module_id):
         return False
 
 def ResetCurrentQuestionCorrect(user_id, module_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
     conn = create_connection(database)
@@ -214,7 +256,6 @@ def ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id):
     user_module = (user_id, module_id)
     sql = 'UPDATE accounts_module_user SET currentQuestionHints = 0, currentQuestionCorrect = 0 WHERE user_id = ? AND module_id = ?'
 
-    print("it comes here")
     cur = conn.cursor()
     cur.execute(sql,user_module)
        
@@ -227,23 +268,23 @@ def answer1_1a(request):
     if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint = "De x-termen én constanten zijn niet goed bij elkaar opgeteld."
-        AnswerAnswered(user.id, 1, False, 0)
+        AnswerAnswered(user.id, 1, False, 0, 6)
     elif  answerGiven[0] != answerOriginal[0]:
         text = "Jouw antwoord was fout."
         hint = "De x-termen zijn niet goed opgeteld."
-        AnswerAnswered(user.id, 1, False, 0)
+        AnswerAnswered(user.id, 1, False, 0, 2)
     elif answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint = "De constanten zijn niet goed opgeteld."
-        AnswerAnswered(user.id, 1, False, 0)
+        AnswerAnswered(user.id, 1, False, 0, 1)
     elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
-        AnswerAnswered(user.id, 1, True, 0)
+        AnswerAnswered(user.id, 1, True, 0, 0)
     else:
         text = "Jouw antwoord was fout."
         hint = "Let goed op de plus- en mintekens."
-        AnswerAnswered(user.id, 1, False, 0)
+        AnswerAnswered(user.id, 1, False, 0, 0)
     
     nextQuestionPossible = IsNextQuestionPossible(user.id, 1)
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
@@ -293,21 +334,21 @@ def answer1_1b(request):
     if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint = "Tel de x-termen goed op aan de linkerzijde. Tel de constanten goed op aan de rechterzijde. Let goed op plus- en mintekens."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven[0] != answerOriginal[0]:
         text = "Jouw antwoord was fout."
         hint = "De linkerzijde heeft niet (alleen) het goede aantal x-termen. Let goed op plus- en mintekens."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint =  "De rechterzijde heeft niet de goede waarde, de constanten zijn niet goed opgeteld. Let goed op plus- en mintekens."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
-        AnswerAnswered(request.user.id, 1, True, 0)
+        AnswerAnswered(request.user.id, 1, True, 0, 0)
     else:
         text = "Jouw antwoord was fout."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 0)
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
 
 
@@ -368,26 +409,27 @@ def answer1_1c(request):
     if answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
-        AnswerAnswered(request.user.id, 1, True, 0)
+        AnswerAnswered(request.user.id, 1, True, 0, 0)
     elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op met het optellen of aftrekken van de constanten."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven == answerDiv:
         text = "Jouw antwoord was fout."
         hint = "Let op met delen."
-        AnswerAnswered(request.user.id, 1, False, 0)
+        AnswerAnswered(request.user.id, 1, False, 0, 3)
     else:
        text = "Jouw antwoord was fout." 
        hint = "Let goed op de plus- en mintekens."
+       AnswerAnswered(request.user.id, 1, False, 0, 0)
     
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
@@ -424,21 +466,27 @@ def answer1_1d(request): # nu nog een copy van c.
     if answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+        AnswerAnswered(request.user.id, 1, True, 0, 0)
     elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
+        AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op met het optellen of aftrekken van de constanten."
+        AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
+        AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven == answerDiv:
         text = "Jouw antwoord was fout."
         hint = "Let op met delen."
+        AnswerAnswered(request.user.id, 1, False, 0, 3)
     else:
        text = "Jouw antwoord was fout." 
        hint = "Let goed op de plus- en mintekens."
+       AnswerAnswered(request.user.id, 1, False, 0, 0)
     
     return render(request, 'accounts/answers/answer1_1d.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
         'text': text, 'hint': hint, 'question': question})
