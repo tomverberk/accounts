@@ -8,6 +8,7 @@ from .forms import AnswerForm, CustomUserCreationForm, CustomUserChangeForm
 import random, sqlite3, getpass
 from sqlite3 import Error
 #import numpy as np
+database = r"db.sqlite3"
 
 def signUp(request):
     if request.method == 'POST':
@@ -59,7 +60,7 @@ def create_user(conn, user):
     return cur.lastrowid
 
 def insertNewUser(user_id):
-    database = r"C:/MathApp/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
     #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
@@ -74,7 +75,7 @@ def insertNewUser(user_id):
             addModule = create_user(conn, user_Module)
  
 def AnswerAnswered(user_id, module_id, correct, hintsUsed, mistakeNr):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
     #database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
@@ -223,7 +224,7 @@ def module1_1a(request):
     return render(request, 'module1/module1_1a.html', {'questions':questions})
 
 def IsNextQuestionPossible(user_id, module_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
     conn = create_connection(database)
@@ -242,7 +243,7 @@ def IsNextQuestionPossible(user_id, module_id):
         return False
 
 def ResetCurrentQuestionCorrect(user_id, module_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
     conn = create_connection(database)
