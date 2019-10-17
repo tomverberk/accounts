@@ -14,14 +14,16 @@
     <br><br>
     {{ text }}
     <br><br>
+    <button type="button" onclick="showHint()"> Bekijk een hint </button><br><br>
+      <div id="showHint" style="display: none; margin: 20px;" class="base">
+      <b> Hint </b> : {{hint}}
+      </div>
     {% if nextQuestionPossible %}
-                <a href="{% url 'module1_1c_from_module1_1b' %}"> Volgende vraag </a> 
-                {% endif %}
-    <form action="{% url 'module1_1b' %}"><button>Doe deze vraag opnieuw</button></form><br><br>
-    <button type="button" onclick="showHint()"> Bekijk een hint </button> &nbsp;&nbsp;<br><br>
-        <div id="showHint" style="display: none;" class="base">
-            <b> Hint </b> : {{hint}}
-        </div>
+      <form action="{% url 'module1_1c_from_module1_1b' %}"><button style="float: right" >Volgende vraag</button></form>
+    {% else %}
+      <button style="float: right ; background-color: lightgrey;" >Volgende vraag</button>
+    {% endif %}
+    <form action="{% url 'module1_1b' %}"><button style="float: left">Doe deze vraag opnieuw</button></form><br><br>
 </div>
 
 <script>
