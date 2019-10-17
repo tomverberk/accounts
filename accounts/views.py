@@ -59,8 +59,8 @@ def create_user(conn, user):
     return cur.lastrowid
 
 def insertNewUser(user_id):
-    database = r"C:/MathApp/accounts/db.sqlite3"
-    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
     conn = create_connection(database)
@@ -74,8 +74,8 @@ def insertNewUser(user_id):
             addModule = create_user(conn, user_Module)
  
 def AnswerAnswered(user_id, module_id, correct, hintsUsed):
-    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
-    database = r"C:/MathApp/accounts/db.sqlite3"
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
 
@@ -248,7 +248,7 @@ def answer1_1a(request):
     
     nextQuestionPossible = IsNextQuestionPossible(user.id, 1)
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
 
 def module1_1b(request):
     question = {}
@@ -314,7 +314,7 @@ def answer1_1b(request):
 
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     return render(request, 'accounts/answers/answer1_1b.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
 
 def module1_1c(request):
     question = {}
@@ -488,6 +488,9 @@ def answer(request):
         AnswerAnswered(request.user.id, module_id, False, 0)
 
     return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
+
+def teacherOverview(request):
+    return render(request, 'teacher.html')
 
 def get_answer(request):
     # if this is a POST request we need to process the form data
