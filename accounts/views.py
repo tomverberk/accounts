@@ -536,6 +536,95 @@ def answer(request):
 
     return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
 
+def teacherOverview(request):
+    isTeacher = IsTeacher(request.user.id)
+    if isTeacher:
+        records = GetAllInfo()
+        return render(request, 'teacher.html',{'records':records})
+    else:
+        return render(request, 'teacherconformation.html')
+    
+def GetAllInfo():
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+            return GetAllInfoDatabase(conn)
+
+def GetAllInfoDatabase(conn):
+    #sql = 'SELECT username, generalIntelligence FROM accounts_customuser WHERE isTeacher = 0'
+    sql = 'SELECT username, generalIntelligence, id FROM accounts_customuser WHERE isTeacher = 0'
+    
+    cur = conn.cursor()
+    cur.execute(sql)
+    records = cur.fetchall()
+    recordsWithValue = []
+
+    for record in records:
+        inputQuery = [record[2]]
+        sqlAmount = 'SELECT amountCorrect, amountWrong FROM accounts_module_user WHERE user_id = ?'
+        cur = conn.cursor()
+        cur.execute(sqlAmount,inputQuery)
+        newRecords = cur.fetchall()
+        totalCorrect = 0
+        totalWrong = 0
+        for newrecord in newRecords:
+            totalCorrect = totalCorrect + newrecord[0]
+            totalWrong = totalWrong + newrecord[1]
+        recordsWithValue.append([record[0],record[1],totalCorrect,totalWrong])
+    return recordsWithValue
+
+def IsTeacher(user_id):
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+             return IsTeacherDatabase(conn, user_id)
+
+def IsTeacherDatabase(conn, user_id):
+    inputQuery = [user_id]
+    sql = 'SELECT isTeacher FROM accounts_customuser WHERE id = ?'
+
+    cur = conn.cursor()
+    cur.execute(sql, inputQuery)
+    records = cur.fetchall()
+    return records[0][0]
+
+def confirmTeacher(request):
+    passwordGiven= request.POST['password']
+    password = "Lerarerzijnhetbeste!"
+    user = request.user.id
+    if passwordGiven == password:
+        MakeTeacher(user)
+        return render(request, 'teacher.html')
+    else:
+        alert("this password was incorrect")
+    
+
+def MakeTeacher(user_id):
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+             return MakeTeacherDatabase(conn, user_id)
+
+def MakeTeacherDatabase(conn, user_id):
+    print(user_id)
+    inputQuery = [user_id]
+    sql = 'UPDATE accounts_customuser SET isTeacher = True WHERE id = ?'
+
+    cur = conn.cursor()
+    cur.execute(sql,inputQuery)
+
 def get_answer(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':

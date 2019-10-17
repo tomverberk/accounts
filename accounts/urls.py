@@ -12,10 +12,10 @@ from . import views
 urlpatterns = [
     path('signup/', views.signUp, name='signup'),
     path('showInfo/', views.showInfo, name='showInfo'),
-
+    path('teacherOverview', views.teacherOverview, name='teacherOverview'),
+    path('confirmTeacher', views.confirmTeacher, name='confirmTeacher'),
     path('exampleQuestion', views.exampleQuestion, name='exampleQuestion'),
     #path('answer/', views.answer, name='answer'),
-    
     path('moduleOverview/', views.moduleOverview, name='moduleOverview'),
     path('module1', views.module1, name='module1'),
     path('module1_1/', views.module1_1, name='module1_1'),
