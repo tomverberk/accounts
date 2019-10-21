@@ -9,15 +9,25 @@
     Jouw antwoord: <br>
     y = {{answerGiven}}
     <br><br>
+    {% if correct %}
+    Je antwoord is goed!<br><br>
+    {% else %}
     Het juiste antwoord: <br>
     y = {{answerOriginal}}
     <br><br>
-    {{ text }}
+    Helaas, dat is niet goed. Probeer het nog een keer.
     <br><br>
     <button type="button" onclick="showHint()"> Bekijk een hint </button><br><br>
-    <div id="showHint" style="display: none; margin: 20px;" class="base">
-     <b> Hint </b> : {{hint}}
+      <div id="showHint" style="display: none; margin: 20px;" class="base">
+       <b> Hint </b> : {{hint}}
+      </div>
+    {% endif %}
+    {% if toManyMistakes %}
+    <div>
+      Je hebt al meerdere malen dezelfde fout gemaakt, <br>
+      misschien is het handig om hulp te vragen. <br><br>
     </div>
+    {% endif %}
     {% if nextQuestionPossible %}
       <form action="{% url 'module1_1d_from_module1_1c' %}"><button style="float: right" >Volgende vraag</button></form>
     {% else %}
