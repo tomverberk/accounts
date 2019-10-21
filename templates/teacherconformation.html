@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+<div class="base">
+  I am not a teacher
+  <form action="/accounts/confirmTeacher" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <p> Vul het lerarenwachtwoord in: <br><br>  <input style="width: 120px;" type="text" step="0.01" name="password">  </p>
+    <button type="submit">Controleer</button>   &nbsp;&nbsp;
+    <br><br>
+    {% for message in messages %}
+
+                    <div class="alert alert-success">
+                        <a class="close" href="#" data-dismiss="alert">×</a>
+
+                        {{ message }}
+
+                    </div>
+        {% endfor %}
+  </form>  
+</div>
+{% endblock %}
