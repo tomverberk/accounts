@@ -7,6 +7,7 @@ from .models import CustomUser, ModuleOverview, Module, SubModule, Exam
 from .forms import AnswerForm, CustomUserCreationForm, CustomUserChangeForm
 import random, sqlite3, getpass
 from sqlite3 import Error
+from django.shortcuts import redirect
 #import numpy as np
 database = r"db.sqlite3"
 
@@ -53,8 +54,12 @@ def create_user(conn, user):
     :param project:
     :return: project id
     """
-    sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5, currentQuestionHints, currentQuestionCorrect)
-                                VALUES (?, false, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0) """
+    if(user[1] == 1):    
+        sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5, currentQuestionHints, currentQuestionCorrect)
+                                VALUES (?, 1, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0) """
+    else:
+        sql = """INSERT INTO accounts_module_user (user_id, currentModule, amountCorrect, amountWrong, amountHints, moduleScore, module_id, mistake1, mistake2, mistake3, mistake4, mistake5, currentQuestionHints, currentQuestionCorrect)
+                                VALUES (?, 0, 0, 0, 0, 0, ?, 0, 0, 0, 0, 0, 0, 0) """
     cur = conn.cursor()
     cur.execute(sql, user)
     return cur.lastrowid
@@ -65,7 +70,6 @@ def insertNewUser(user_id):
 
     # create a database connection
     conn = create_connection(database)
-    print('ahhhhh')
 
     modules = Module.objects.all()
     for module in modules:
@@ -82,7 +86,9 @@ def AnswerAnswered(user_id, module_id, correct, hintsUsed, mistakeNr):
 
     with conn:
         # create a new project
-            answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed, mistakeNr)
+        amountMistake = answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed, mistakeNr)
+    
+    return amountMistake
 
 def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed, mistakeNr):
     user_module = (user_id, module_id)
@@ -122,11 +128,16 @@ def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed, mistake
     newAmountCorrect_Wrong = records[0][0]+1
     if correct:
         newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, user_id, module_id]
+        amountMaxMistake = 0
     elif mistakeNr == 6:
         newMistakeY = records[0][5]+1
         newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, newMistakeX, newMistakeY, user_id, module_id]
+        amountMaxMistake = max(newMistakeX, newMistakeY)
     else:
         newcorrect = [newAmountCorrect_Wrong, newAmountHints, newcurrentQuestionHints, newCurrentQuestionCorrect, newMistakeX, user_id, module_id]
+        amountMaxMistake = newMistakeX
+
+    
 
     if correct:
         sql = 'UPDATE accounts_module_user SET amountCorrect = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ? WHERE user_id = ? AND module_id = ?'
@@ -142,14 +153,13 @@ def answerAnsweredDatabase(conn, user_id, module_id, correct, hintsUsed, mistake
         elif mistakeNr == 5:
             sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake5 = ? WHERE user_id = ? AND module_id = ?'
         elif mistakeNr == 6:
-            print(mistakeNr)
-            print(correct)
             sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake1 = ?, mistake2 = ? WHERE user_id = ? AND module_id = ?'
         else:
             sql = 'UPDATE accounts_module_user SET amountWrong = ?, amountHints = ?, currentQuestionHints = ?, currentQuestionCorrect = ?, mistake1 = ? WHERE user_id = ? AND module_id = ?'
 
     cur = conn.cursor()
     cur.execute(sql,newcorrect)
+    return amountMaxMistake
 
 def showInfo(request):
 #    generateIntelligence = generateIntelligence.objects.all()
@@ -194,6 +204,39 @@ def signUp(request):
 def moduleOverview(request):     # maybe make this a normal class as well, and just fill the few submodules manually?
    list = ModuleOverview.text
    return render(request, 'moduleOverview.html', {'Hoofdstukken overzicht': list} )
+
+def moduleCurrent(request):
+    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+            currentModule = moduleCurrentDatabase(conn, request.user.id)
+    if(currentModule[0]==1): 
+        if(currentModule[1]==1):
+            return redirect('/accounts/module1_1a/')
+        if(currentModule[1]==2):
+            return redirect('/accounts/module1_1b/')
+        if(currentModule[1]==3):
+            return redirect('/accounts/module1_1c/')
+        if(currentModule[1]==4):
+            return redirect('/accounts/module1_1d/')
+    else:
+        return redirect('/accounts/home')
+    
+  
+
+def moduleCurrentDatabase(conn, user_id):
+    inputQuery = [user_id]
+    sql = 'SELECT module_id, currentModule FROM accounts_module_user WHERE user_id = ? AND currentModule > 0'
+
+    cur = conn.cursor()
+    cur.execute(sql, inputQuery)
+    records = cur.fetchall()
+    return records[0]
+
 
 def module1(request):
     text = "Wat is het goede antwoord " # % number
@@ -242,7 +285,7 @@ def IsNextQuestionPossible(user_id, module_id):
     else:
         return False
 
-def ResetCurrentQuestionCorrect(user_id, module_id):
+def ResetCurrentQuestionCorrect(user_id, module_id, nextModule):
     #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
 
     # create a database connection
@@ -250,14 +293,14 @@ def ResetCurrentQuestionCorrect(user_id, module_id):
 
     with conn:
         # create a new project
-            ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id)
+            ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id, nextModule)
 
-def ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id):
-    user_module = (user_id, module_id)
-    sql = 'UPDATE accounts_module_user SET currentQuestionHints = 0, currentQuestionCorrect = 0 WHERE user_id = ? AND module_id = ?'
+def ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id, nextModule):
+    next_user_module = (nextModule, user_id, module_id)
+    sql = 'UPDATE accounts_module_user SET currentQuestionHints = 0, currentQuestionCorrect = 0, currentModule = ? WHERE user_id = ? AND module_id = ?'
 
     cur = conn.cursor()
-    cur.execute(sql,user_module)
+    cur.execute(sql,next_user_module)
        
 
 def answer1_1a(request):
@@ -268,27 +311,36 @@ def answer1_1a(request):
     if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint = "De x-termen én constanten zijn niet goed bij elkaar opgeteld."
-        AnswerAnswered(user.id, 1, False, 0, 6)
+        maxMistake = AnswerAnswered(user.id, 1, False, 0, 6)
     elif  answerGiven[0] != answerOriginal[0]:
         text = "Jouw antwoord was fout."
         hint = "De x-termen zijn niet goed opgeteld."
-        AnswerAnswered(user.id, 1, False, 0, 2)
+        maxMistake = AnswerAnswered(user.id, 1, False, 0, 2)
     elif answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
-        hint = "De constanten zijn niet goed opgeteld."
-        AnswerAnswered(user.id, 1, False, 0, 1)
+        maxMistake = AnswerAnswered(user.id, 1, False, 0, 1)
+        hint = "De constanten zijn niet goed opgeteld."   
     elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
-        AnswerAnswered(user.id, 1, True, 0, 0)
+        maxMistake = AnswerAnswered(user.id, 1, True, 0, 0)
     else:
         text = "Jouw antwoord was fout."
         hint = "Let goed op de plus- en mintekens."
-        AnswerAnswered(user.id, 1, False, 0, 0)
+        maxMistake = AnswerAnswered(user.id, 1, False, 0, 0)
+
+    print(maxMistake)
+    if maxMistake > 2:
+        toManyMistakes = True
+    else:
+        toManyMistakes = False
+    
+    print(toManyMistakes)
     
     nextQuestionPossible = IsNextQuestionPossible(user.id, 1)
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint,
+         'question': question, 'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
 def module1_1b(request):
     question = {}
@@ -310,7 +362,8 @@ def module1_1b(request):
     return render(request, 'module1/module1_1b.html', {'questions':questions})
 
 def module1_1b_from_module1_1a(request):
-    ResetCurrentQuestionCorrect(request.user.id, 1)
+    nextModule = 2
+    ResetCurrentQuestionCorrect(request.user.id, 1, nextModule)
     question = {}
     a = random.randint(-10,10)
     b = random.randint(-20,20)
@@ -334,27 +387,32 @@ def answer1_1b(request):
     if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint = "Tel de x-termen goed op aan de linkerzijde. Tel de constanten goed op aan de rechterzijde. Let goed op plus- en mintekens."
-        AnswerAnswered(request.user.id, 1, False, 0, 6)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven[0] != answerOriginal[0]:
         text = "Jouw antwoord was fout."
         hint = "De linkerzijde heeft niet (alleen) het goede aantal x-termen. Let goed op plus- en mintekens."
-        AnswerAnswered(request.user.id, 1, False, 0, 2)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint =  "De rechterzijde heeft niet de goede waarde, de constanten zijn niet goed opgeteld. Let goed op plus- en mintekens."
-        AnswerAnswered(request.user.id, 1, False, 0, 1)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
-        AnswerAnswered(request.user.id, 1, True, 0, 0)
+        maxMistake = AnswerAnswered(request.user.id, 1, True, 0, 0)
     else:
         text = "Jouw antwoord was fout."
-        AnswerAnswered(request.user.id, 1, False, 0, 0)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 0)
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
 
+    if maxMistake > 2 & (answerGiven != answerOriginal):
+        toManyMistakes = True
+    else:
+        toManyMistakes = False
 
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     return render(request, 'accounts/answers/answer1_1b.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question,
+         'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
 def module1_1c(request):
     question = {}
@@ -380,7 +438,8 @@ def module1_1c(request):
     return render(request, 'module1/module1_1c.html', {'questions':questions})
 
 def module1_1c_from_module1_1b(request):
-    ResetCurrentQuestionCorrect (request.user.id, 1)
+    nextmodule = 3
+    ResetCurrentQuestionCorrect (request.user.id, 1, nextModule)
     question = {}
     question["answer"] = random.randint(-20,20)
     if question["answer"]==0:
@@ -409,31 +468,36 @@ def answer1_1c(request):
     if answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
-        AnswerAnswered(request.user.id, 1, True, 0, 0)
+        maxMistake = AnswerAnswered(request.user.id, 1, True, 0, 0)
     elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
-        AnswerAnswered(request.user.id, 1, False, 0, 6)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op met het optellen of aftrekken van de constanten."
-        AnswerAnswered(request.user.id, 1, False, 0, 1)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
-        AnswerAnswered(request.user.id, 1, False, 0, 2)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven == answerDiv:
         text = "Jouw antwoord was fout."
         hint = "Let op met delen."
-        AnswerAnswered(request.user.id, 1, False, 0, 3)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 3)
     else:
        text = "Jouw antwoord was fout." 
        hint = "Let goed op de plus- en mintekens."
-       AnswerAnswered(request.user.id, 1, False, 0, 0)
+       maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 0)
+
+    if maxMistake > 2 & (answerGiven != answerOriginal):
+        toManyMistakes = True
+    else:
+        toManyMistakes = False
     
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
-        'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
+        'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
 def module1_1d(request): #nu nog een copy van c.
     question = {}
@@ -496,7 +560,8 @@ def module1_2(request):
     return render(request,'module1/module1_1.html', {'vraag': text} )
 
 def module1_2_from_module1_1c(request):
-    ResetCurrentQuestionCorrect(request.user.id, 1)
+    nexModule = 4
+    ResetCurrentQuestionCorrect(request.user.id, 1, nextModule)
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1/module1_1.html', {'vraag': text} )
 

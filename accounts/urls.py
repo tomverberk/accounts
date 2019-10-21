@@ -17,6 +17,7 @@ urlpatterns = [
     path('exampleQuestion', views.exampleQuestion, name='exampleQuestion'),
     #path('answer/', views.answer, name='answer'),
     path('moduleOverview/', views.moduleOverview, name='moduleOverview'),
+    path('moduleCurrent/', views.moduleCurrent, name='moduleCurrent'),
     path('module1', views.module1, name='module1'),
     path('module1_1/', views.module1_1, name='module1_1'),
     path('module1_1a/', views.module1_1a, name='module1_1a'),
