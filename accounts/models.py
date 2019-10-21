@@ -37,7 +37,7 @@ class Module(models.Model):
 class Module_User(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
-    currentModule = models.BooleanField(default = False)
+    currentModule = models.IntegerField(default = 0)
     amountCorrect = models.IntegerField(default = 0)
     amountWrong = models.IntegerField(default = 0)
     amountHints = models.IntegerField(default = 0)

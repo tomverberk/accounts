@@ -18,6 +18,12 @@
     <div id="showHint" style="display: none; margin: 20px;" class="base">
      <b> Hint </b> : {{hint}}
     </div>
+  {% if toManyMistakes %}
+  <div>
+    Je hebt al meerder malen dezelfde fout gemaakt, <br>
+     misschien is het handig om hulp te vragen. <br><br>
+  </div>
+    {% endif %}
   {% if nextQuestionPossible %}
     <form action="{% url 'module1_1b_from_module1_1a' %}"><button style="float: right" >Volgende vraag</button></form>
   {% else %}

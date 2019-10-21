@@ -7,7 +7,7 @@
 {% if user.is_authenticated %}
 <div class="base" style="max-width: 720px;">
   Hoi {{ user.username }}!<br><br><br>
-  <form action="{% url 'module1_1' %}"><button>Huidige module</button></form><br><br><br><! this name and url should change depending on the actual module! >
+  <form action="{% url 'moduleCurrent' %}"><button>Huidige module</button></form><br><br><br><! this name and url should change depending on the actual module! >
   <form action="{% url 'moduleOverview' %}"><button>Module overzicht</button></form><br><br><br>
   <form action="{% url 'showInfo' %}"><button>Score</button></form><br><br><br>
   <form action="{% url 'exampleQuestion' %}"><button>New question</button></form><br><br><br>
