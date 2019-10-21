@@ -195,6 +195,39 @@ def moduleOverview(request):     # maybe make this a normal class as well, and j
    list = ModuleOverview.text
    return render(request, 'moduleOverview.html', {'Hoofdstukken overzicht': list} )
 
+def moduleCurrent(request):
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+            currentModule = moduleCurrentDatabase(conn, request.user.id)
+    if(currentModule[0]==1): 
+        if(currentModule[1]==1):
+            return redirect('/accounts/module1_1a/')
+        if(currentModule[1]==2):
+            return redirect('/accounts/module1_1b/')
+        if(currentModule[1]==3):
+            return redirect('/accounts/module1_1c/')
+        if(currentModule[1]==4):
+            return redirect('/accounts/module1_1d/')
+    else:
+        return redirect('/accounts/home')
+    
+  
+
+def moduleCurrentDatabase(conn, user_id):
+    inputQuery = [user_id]
+    sql = 'SELECT module_id, currentModule FROM accounts_module_user WHERE user_id = ? AND currentModule > 0'
+
+    cur = conn.cursor()
+    cur.execute(sql, inputQuery)
+    records = cur.fetchall()
+    return records[0]
+
+
 def module1(request):
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1/module1.html', {'vraag': text} )
@@ -266,29 +299,30 @@ def answer1_1a(request):
     answerOriginal = correct_answer
     user = request.user
     if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "De x-termen én constanten zijn niet goed bij elkaar opgeteld."
         AnswerAnswered(user.id, 1, False, 0, 6)
     elif  answerGiven[0] != answerOriginal[0]:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "De x-termen zijn niet goed opgeteld."
         AnswerAnswered(user.id, 1, False, 0, 2)
     elif answerGiven[1] != answerOriginal[1]:
-        text = "Jouw antwoord was fout."
-        hint = "De constanten zijn niet goed opgeteld."
-        AnswerAnswered(user.id, 1, False, 0, 1)
+        correct = 0
+        maxMistake = AnswerAnswered(user.id, 1, False, 0, 1)
+        hint = "De constanten zijn niet goed opgeteld."   
     elif answerGiven == answerOriginal:
-        text = "Jouw antwoord was goed!"
+        correct = 1
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         AnswerAnswered(user.id, 1, True, 0, 0)
     else:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let goed op de plus- en mintekens."
         AnswerAnswered(user.id, 1, False, 0, 0)
     
     nextQuestionPossible = IsNextQuestionPossible(user.id, 1)
     return render(request, 'accounts/answers/answer1_1a.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'correct': correct, 'hint': hint,
+         'question': question, 'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
 def module1_1b(request):
     question = {}
@@ -332,29 +366,31 @@ def answer1_1b(request):
     answerGiven = request.POST['answer_1'], request.POST['answer_2']
     answerOriginal = correct_answer
     if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Tel de x-termen goed op aan de linkerzijde. Tel de constanten goed op aan de rechterzijde. Let goed op plus- en mintekens."
         AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven[0] != answerOriginal[0]:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "De linkerzijde heeft niet (alleen) het goede aantal x-termen. Let goed op plus- en mintekens."
         AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven[1] != answerOriginal[1]:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint =  "De rechterzijde heeft niet de goede waarde, de constanten zijn niet goed opgeteld. Let goed op plus- en mintekens."
         AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == answerOriginal:
-        text = "Jouw antwoord was goed!"
-        AnswerAnswered(request.user.id, 1, True, 0, 0)
+        correct = 1
+        hint = ""
+        maxMistake = AnswerAnswered(request.user.id, 1, True, 0, 0)
     else:
-        text = "Jouw antwoord was fout."
-        AnswerAnswered(request.user.id, 1, False, 0, 0)
+        correct = 0
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 0)
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
 
 
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     return render(request, 'accounts/answers/answer1_1b.html', {'answerGiven_1':answerGiven[0],'answerGiven_2':answerGiven[1], \
-        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
+        'answerOriginal_1':answerOriginal[0], 'answerOriginal_2':answerOriginal[1],'correct': correct, 'hint': hint, 'question': question,
+         'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
 def module1_1c(request):
     question = {}
@@ -407,33 +443,33 @@ def answer1_1c(request):
     answerOriginal = float(correct_answer)
     answerDiv = round(1/answerOriginal,2)
     if answerGiven == answerOriginal:
-        text = "Jouw antwoord was goed!"
+        correct = 1
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         AnswerAnswered(request.user.id, 1, True, 0, 0)
     elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
         AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let goed op met het optellen of aftrekken van de constanten."
         AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
         AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven == answerDiv:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let op met delen."
         AnswerAnswered(request.user.id, 1, False, 0, 3)
     else:
-       text = "Jouw antwoord was fout." 
+       correct = 0 
        hint = "Let goed op de plus- en mintekens."
        AnswerAnswered(request.user.id, 1, False, 0, 0)
     
     nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
-        'text': text, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible})
+        'correct': correct, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
 def module1_1d(request): #nu nog een copy van c.
     question = {}
@@ -464,32 +500,32 @@ def answer1_1d(request): # nu nog een copy van c.
     answerOriginal = float(correct_answer)
     answerDiv = round(1/answerOriginal,2)
     if answerGiven == answerOriginal:
-        text = "Jouw antwoord was goed!"
+        correct = 1
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         AnswerAnswered(request.user.id, 1, True, 0, 0)
     elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
         AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let goed op met het optellen of aftrekken van de constanten."
         AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
         AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven == answerDiv:
-        text = "Jouw antwoord was fout."
+        correct = 0
         hint = "Let op met delen."
         AnswerAnswered(request.user.id, 1, False, 0, 3)
     else:
-       text = "Jouw antwoord was fout." 
+       correct = 0 
        hint = "Let goed op de plus- en mintekens."
        AnswerAnswered(request.user.id, 1, False, 0, 0)
     
     return render(request, 'accounts/answers/answer1_1d.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
-        'text': text, 'hint': hint, 'question': question})
+        'correct': correct, 'hint': hint, 'question': question})
 
 def module1_2(request):
     text = "Wat is het goede antwoord " # % number
@@ -535,6 +571,95 @@ def answer(request):
         AnswerAnswered(request.user.id, module_id, False, 0)
 
     return render(request, 'accounts/answer.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, 'text': text})
+
+def teacherOverview(request):
+    isTeacher = IsTeacher(request.user.id)
+    if isTeacher:
+        records = GetAllInfo()
+        return render(request, 'teacher.html',{'records':records})
+    else:
+        return render(request, 'teacherconformation.html')
+    
+def GetAllInfo():
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+            return GetAllInfoDatabase(conn)
+
+def GetAllInfoDatabase(conn):
+    #sql = 'SELECT username, generalIntelligence FROM accounts_customuser WHERE isTeacher = 0'
+    sql = 'SELECT username, generalIntelligence, id FROM accounts_customuser WHERE isTeacher = 0'
+    
+    cur = conn.cursor()
+    cur.execute(sql)
+    records = cur.fetchall()
+    recordsWithValue = []
+
+    for record in records:
+        inputQuery = [record[2]]
+        sqlAmount = 'SELECT amountCorrect, amountWrong FROM accounts_module_user WHERE user_id = ?'
+        cur = conn.cursor()
+        cur.execute(sqlAmount,inputQuery)
+        newRecords = cur.fetchall()
+        totalCorrect = 0
+        totalWrong = 0
+        for newrecord in newRecords:
+            totalCorrect = totalCorrect + newrecord[0]
+            totalWrong = totalWrong + newrecord[1]
+        recordsWithValue.append([record[0],record[1],totalCorrect,totalWrong])
+    return recordsWithValue
+
+def IsTeacher(user_id):
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+             return IsTeacherDatabase(conn, user_id)
+
+def IsTeacherDatabase(conn, user_id):
+    inputQuery = [user_id]
+    sql = 'SELECT isTeacher FROM accounts_customuser WHERE id = ?'
+
+    cur = conn.cursor()
+    cur.execute(sql, inputQuery)
+    records = cur.fetchall()
+    return records[0][0]
+
+def confirmTeacher(request):
+    passwordGiven= request.POST['password']
+    password = "Lerarerzijnhetbeste!"
+    user = request.user.id
+    if passwordGiven == password:
+        MakeTeacher(user)
+        return render(request, 'teacher.html')
+    else:
+        alert("this password was incorrect")
+    
+
+def MakeTeacher(user_id):
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/MathApp/accounts/db.sqlite3"
+    # create a database connection
+    conn = create_connection(database)
+
+    with conn:
+        # create a new project
+             return MakeTeacherDatabase(conn, user_id)
+
+def MakeTeacherDatabase(conn, user_id):
+    print(user_id)
+    inputQuery = [user_id]
+    sql = 'UPDATE accounts_customuser SET isTeacher = True WHERE id = ?'
+
+    cur = conn.cursor()
+    cur.execute(sql,inputQuery)
 
 def get_answer(request):
     # if this is a POST request we need to process the form data
