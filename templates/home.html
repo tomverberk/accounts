@@ -5,13 +5,15 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<div class="base" style="max-width: 720px;">
+<div class="base">
   Hoi {{ user.username }}!<br><br><br>
-  <form action="{% url 'module1_1' %}"><button>Huidige module</button></form><br><br><br><! this name and url should change depending on the actual module! >
+  <form action="{% url 'moduleCurrent' %}"><button>Huidige module</button></form><br><br><br><! this name and url should change depending on the actual module! >
   <form action="{% url 'moduleOverview' %}"><button>Module overzicht</button></form><br><br><br>
+  <form action="{% url 'teacherOverview' %}"><button>Leraren</button></form><br><br><br>
+  <!--  
   <form action="{% url 'showInfo' %}"><button>Score</button></form><br><br><br>
-  <form action="{% url 'exampleQuestion' %}"><button>New question</button></form><br><br><br>
-  <!--<form action="{% url 'logout' %}"><button>Logout</button></form><br><br><br>-->
+  <form action="{% url 'exampleQuestion' %}"><button>New question</button></form><br><br><br> 
+
   <chaptergrid>
   <form action="hoofdstuk1.html">
     <chapter style="float:left">Hoofdstuk 1</chapter>
@@ -24,7 +26,9 @@
   <form action="hoofdstuk1.html">
     <chapter style="float:right">Hoofdstuk 3</chapter>
   </form>
+
   </chaptergrid>
+  -->
 </div>
 {% else %}
 <div class="base" style="width: 360px">

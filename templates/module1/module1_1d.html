@@ -10,13 +10,13 @@
         {{ question.question }}
     {% endfor %}
   </div>      
-  <form action="answer/" method="post">
+  <form action="/accounts/module1.1d/answer/" method="post">
     {% csrf_token %}
     {{ form }}
-    <p>Vult de breuk in: <br><br> t =  <input style="width: 120px;" type="number" step="0.01" name="answer">  </p>
-    <button type="submit">Controleer</button>   &nbsp;&nbsp;
+    <p>Antwoord: <br><br> t =  <input style="width: 120px;" type="number" step="0.01" name="answer">  </p>
+    <button style="float: right;" type="submit">Controleer</button> 
+    <button style="float: left;" type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
     <br><br>
-    <button type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
   </form>  
 </div>
 {% endblock %}

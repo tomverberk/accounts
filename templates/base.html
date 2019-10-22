@@ -10,15 +10,10 @@
 </head>
 <body>
     <nav>    
-        <ul>
+        <ul class="navigationbar">
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#">Hoofdstukken</a></li>
-            <!--
-            <li><a href="#">News</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">About</a></li>
-            -->
-            <li style="float:right"><a class="active" href="{% url 'logout' %}">Logout</a></li>
+            <li><a href="{% url 'moduleOverview' %}">Hoofdstukken</a></li>
+            <li style="float:right"><a class="active" href="{% url 'logout' %}">Uitloggen</a></li>
           </ul>
       </nav>
   <main>
