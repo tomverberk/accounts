@@ -171,6 +171,9 @@ def answer1_1a(request):
     elif answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint = "De constanten zijn niet goed opgeteld."
+    elif answerGiven == - answerOriginal:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met plus- en mintekens wegstrepen."
     elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
@@ -213,6 +216,9 @@ def answer1_1b(request):
     elif answerGiven[1] != answerOriginal[1]:
         text = "Jouw antwoord was fout."
         hint =  "De rechterzijde heeft niet de goede waarde, de constanten zijn niet goed opgeteld. Let goed op plus- en mintekens."
+    elif answerGiven == - answerOriginal:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met plus- en mintekens wegstrepen."
     elif answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
@@ -256,6 +262,12 @@ def answer1_1c(request):
     if answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+    elif answerGiven == - answerOriginal:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met plus- en mintekens wegstrepen."
+    elif answerGiven == answerDiv:
+        text = "Jouw antwoord was fout."
+        hint = "Let op met delen."
     elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
@@ -265,9 +277,6 @@ def answer1_1c(request):
     elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
         text = "Jouw antwoord was fout."
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
-    elif answerGiven == answerDiv:
-        text = "Jouw antwoord was fout."
-        hint = "Let op met delen."
     else:
        text = "Jouw antwoord was fout." 
        hint = "Let goed op de plus- en mintekens."
@@ -275,76 +284,68 @@ def answer1_1c(request):
     return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
         'text': text, 'hint': hint, 'question': question})
 
-def module1_1d(request): #nu nog een copy van c.
+def module1_1d(request):
     question = {}
-    question["answer"] = random.randint(-20,20)
+    question["answer"] = random.randint(-10,10)
     if  question["answer"]==0:
         question["answer"] = 1
-    left = random.randint(-10,10)
-    if  left == 0:
-        left = 1:
-    right = left*question["answer"]
-    #b,e,h,k : a + (bx+c). one becomes zero, another becomes varied
-    b = 1
-    e = 1
-    h = 1
-    k = 1
-    bracket = random.randint(1,4)
-    if   bracket ==1:
-        b = random.randint(-3,3) and h == 0
-    elif bracket ==2:
-        e = random.randint(-3,3) and k == 0
-    elif bracket ==3:
-        h = random.randint(-3,3) and e == 0
-    elif bracket ==4:
-        k = random.randint(-3,3) and b == 0
-    #c,f,g,i : constants in brackets
-    c = random.randint(-10,10)
-    f = random.randint(-20,20)
-    g = random.randint(-10,10)
-    i = random.randint(-20,20)
-    #a,d,g,j: constants before brackets
-    d = random.randint(-20,20)
-    j = random.randint(-20,20)
-    a = left - d*e + g*h + j*k
-    b = random.randint(-20,20)
-    j = right + 
+    bottom = random.randint(-10,10)
+    if  bottom== 0:
+         bottom = 1
+    top = bottom*question["answer"]
+
+    #b,e,h,k : a + (bx+c). 
+    b = 1 #minus values cause a problem here..., prevents divide by zero for a (see below)
+    e = random.randint(-13,13)
+    h = random.randint(-5,5)
+    k = random.randint(-3,3)
+
+    #a,d,g,j: constants before brackets, solves with bottom 
+    g = 1 #minus values cause a problem here,  prevents divide by zero for i (see below)
+    d = random.randint(-5,5) 
+    j =  random.randint(-5,5)
+    a = (bottom - d*e + g*h + j*k)/b
+    if a == 0: #make sure solving is also carried through to 'top'-solve
+        d = d + 1
+        e = e + 2
+        h = h + 5
+        a = (bottom - d*e + g*h + j*k)/b
+    question["answer_bottom"] = a*b + d*e - g*h - j*k
+    
+    #c,f,g,i : constants in brackets, solve with top
+    c = random.randint(-1,1)
+    f = random.randint(-2,2)
+    l = random.randint(-20,20)
+    i = (top - j*l +a*c +d*f)/g
+    question["answer_top"] = g*i + j*l - a*c - d*f
     
     global variables
-    variables = [a,b,c,d]
-    question["question"] = "%s(%st + %s) + %s(%st + %s)  = %s(%st + %s) + %s(%st + %s) " %(a,b,c,d,e,f,g,h,i,j,k,l)  #vary which terms have 'x'? # vary name 'x', # +- = -
-    question["answer_1"] = a - c
-    question["answer_2"] = d - b
+    variables = [a,b,c,d,e,f,g,h,i,j,k,l]
+    question["question"] = "%d(%dt + %d) + %d(%dt + %d)  = %d(%dt + %d) + %d(%dt + %d)" %(a,b,c,d,e,f,g,h,i,j,k,l)
     global correct_answer
     correct_answer = question["answer"]
     questions = []
     questions.append(question)
-
     return render(request, 'module1/module1_1d.html', {'questions':questions})
 
-def answer1_1d(request): # nu nog een copy van c.
-    question = "%sy + %s = %sy + %s" %(variables[0],variables[1],variables[2],variables[3])
+def answer1_1d(request): 
+    question = "%d(%dt + %d) + %d(%dt + %d)  = %d(%dt + %d) + %d(%dt + %d)" %(variables[0],variables[1],variables[2],variables[3],variables[4],variables[5], \
+        variables[6], variables[7],variables[8],variables[9],variables[10],variables[11])
     answerGiven = float(request.POST['answer'])
-    answerOriginal = float(correct_answer)
+    answerOriginal = round(float(correct_answer),2)
     answerDiv = round(1/answerOriginal,2)
     if answerGiven == answerOriginal:
         text = "Jouw antwoord was goed!"
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
-    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
-        text = "Jouw antwoord was fout."
-        hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
-    elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
-        text = "Jouw antwoord was fout."
-        hint = "Let goed op met het optellen of aftrekken van de constanten."
-    elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
-        text = "Jouw antwoord was fout."
-        hint = "Let goed op met het optellen of aftrekken van de x-termen."
+    elif answerGiven == - answerOriginal:
+        text = "Jouw antwoord niet goed."
+        hint = "Maar bijna goed, let op met plus- en mintekens wegstrepen."
     elif answerGiven == answerDiv:
         text = "Jouw antwoord was fout."
         hint = "Let op met delen."
     else:
        text = "Jouw antwoord was fout." 
-       hint = "Let goed op de plus- en mintekens."
+       hint = "Werk eerst de haakjes weg."
     
     return render(request, 'accounts/answers/answer1_1d.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
         'text': text, 'hint': hint, 'question': question})

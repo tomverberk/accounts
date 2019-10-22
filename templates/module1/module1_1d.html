@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="base">
-  <h4> Los de lineaire vergelijking op voor t, werk de haakjes eerst weg. </h4>
+  <h4> Los de lineaire vergelijking op voor t. </h4>
   <div>
     {% for question in questions %}
         {{ question.question }}
@@ -13,7 +13,7 @@
   <form action="answer/" method="post">
     {% csrf_token %}
     {{ form }}
-    <p>Antwoord: <br><br> y =  <input style="width: 120px;" type="number" step="0.01" name="answer">  </p>
+    <p>Vult de breuk in: <br><br> t =  <input style="width: 120px;" type="number" step="0.01" name="answer">  </p>
     <button type="submit">Controleer</button>   &nbsp;&nbsp;
     <br><br>
     <button type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
