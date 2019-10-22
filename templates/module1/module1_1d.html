@@ -10,7 +10,7 @@
         {{ question.question }}
     {% endfor %}
   </div>      
-  <form action="/accounts/module1.1d/answer/" method="post">
+  <form action="/accounts/module1_1d/answer/" method="post">
     {% csrf_token %}
     {{ form }}
     <p>Antwoord: <br><br> t =  <input style="width: 120px;" type="number" step="0.01" name="answer">  </p>

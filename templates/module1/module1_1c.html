@@ -13,7 +13,7 @@
   <form action="/accounts/module1_1c/answer/" method="post">
     {% csrf_token %}
     {{ form }}
-    <p>Antwoord: <br><br> y =  <input style="width: 120px;" type="number" step="0.01" name="answer">  </p>
+    <p>Antwoord: <br><br> y =  <input style="width: 120px;" type="number" step="0.001" name="answer">  </p>
     <button style="float: right;" type="submit">Controleer</button> 
     <button style="float: left;" type="button" onClick="window.location.reload();"> Nieuwe vraag </button>
     <br><br>
