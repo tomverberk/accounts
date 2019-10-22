@@ -11,28 +11,6 @@ from django.shortcuts import redirect
 #import numpy as np
 database = r"db.sqlite3"
 
-def signUp(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            
-            users = CustomUser.objects.all()
-            for user in users:
-                if user.username == username:
-                    insertNewUser(user.id)
-                    request.session['username'] = user.id
-
-            return render(request, 'home.html')
-    else:
-        form_class = CustomUserCreationForm
-        success_url = reverse_lazy('login')
-        template_name = 'signup.html'
-        form = CustomUserCreationForm(request.POST)
-    return render(request, 'signup.html', {'form': form})
-
 def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by db_file
@@ -251,13 +229,17 @@ def module1_1a(request):
     question = {}
     a = random.randint(-20,20)
     b = random.randint(-20,20)
+    if b==0:
+        b = 8
     c = random.randint(-20,20)
     d = random.randint(-3,3)
+    if d == 0:
+        d = -4
     global variables
     variables = [a,b,c,d]
-    question["question"] = "%sx + %s + %sx + %s" %(a,b,c,d) 
-    question["answer_1"] = "%s" %(a+c)
-    question["answer_2"] = "%s" %(b+d)
+    question["question"] = "%dx + %d + %dx + %d" %(a,b,c,d) 
+    question["answer_1"] = "%d" %(a+c)
+    question["answer_2"] = "%d" %(b+d)
     question["answer"] = question["answer_1"], question["answer_2"]
     global correct_answer
     correct_answer = question["answer"]
@@ -304,23 +286,23 @@ def ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id, nextModule):
        
 
 def answer1_1a(request):
-    question = "%sx + %s + %sx + %s" %(variables[0],variables[1],variables[2],variables[3])
+    question = "%dx + %d + %dx + %d" %(variables[0],variables[1],variables[2],variables[3])
     answerGiven = request.POST['answer_1'], request.POST['answer_2']
-    answerOriginal = correct_answer
+    answerOriginal = correct_answer[0], correct_answer[1] 
     user = request.user
-    if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
+    if round(float(answerGiven[0])) != round(float(answerOriginal[0])) and round(float(answerGiven[1])) != round(float(answerOriginal[1])):
         correct = 0
         hint = "De x-termen én constanten zijn niet goed bij elkaar opgeteld."
         maxMistake = AnswerAnswered(user.id, 1, False, 0, 6)
-    elif  answerGiven[0] != answerOriginal[0]:
+    elif  round(float(answerGiven[0])) != round(float(answerOriginal[0])):
         correct = 0
         hint = "De x-termen zijn niet goed opgeteld."
         maxMistake = AnswerAnswered(user.id, 1, False, 0, 2)
-    elif answerGiven[1] != answerOriginal[1]:
+    elif round(float(answerGiven[1])) !=  round(float(answerOriginal[1])): 
         correct = 0
         maxMistake = AnswerAnswered(user.id, 1, False, 0, 1)
         hint = "De constanten zijn niet goed opgeteld."   
-    elif answerGiven == answerOriginal:
+    elif round(float(answerGiven[0]),2) == round(float(answerOriginal[0]),2) and round(float(answerGiven[1]),2) == round(float(answerOriginal[1]),2):
         correct = 1
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         maxMistake = AnswerAnswered(user.id, 1, True, 0, 0)
@@ -346,13 +328,19 @@ def module1_1b(request):
     question = {}
     a = random.randint(-10,10)
     b = random.randint(-20,20)
+    if b ==0:
+        b = 4
     c = random.randint(-20,20)
+    if c ==a:
+        c = c + 3 
     d = random.randint(-5,5)
+    if d ==0:
+        d == -7
     global variables
     variables = [a,b,c,d]
-    question["question"] = "%sx + %s = %sx + %s" %(a,b,c,d)  
-    question["answer_1"] = "%s" %(a-c)
-    question["answer_2"] = "%s" %(d-b)
+    question["question"] = "%dx + %d = %dx + %d" %(a,b,c,d)  
+    question["answer_1"] = "%d" %(a-c)
+    question["answer_2"] = "%d" %(d-b)
     question["answer"] = question["answer_1"], question["answer_2"]
     global correct_answer
     correct_answer = question["answer"]
@@ -367,11 +355,19 @@ def module1_1b_from_module1_1a(request):
     question = {}
     a = random.randint(-10,10)
     b = random.randint(-20,20)
+    if b ==0:
+        b = 4
     c = random.randint(-20,20)
+    if c ==a:
+        c = c + 3 
     d = random.randint(-5,5)
-    question["question"] = "%sx + %s = %sx + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
-    question["answer_1"] = "%s" %(a-c)
-    question["answer_2"] = "%s" %(d-b)
+    if d ==0:
+        d == -7
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%dx + %d = %dx + %d" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    question["answer_1"] = "%d" %(a-c)
+    question["answer_2"] = "%d" %(d-b)
     question["answer"] = question["answer_1"], question["answer_2"]
     global correct_answer
     correct_answer = question["answer"]
@@ -384,26 +380,32 @@ def answer1_1b(request):
     question = "%sx + %s = %sx + %s" %(variables[0],variables[1],variables[2],variables[3])
     answerGiven = request.POST['answer_1'], request.POST['answer_2']
     answerOriginal = correct_answer
-    if answerGiven[0] != answerOriginal[0] and answerGiven[1] != answerOriginal[1]:
+    if  round(float(answerGiven[0])) != round(float(answerOriginal[0])) and round(float(answerGiven[1])) != round(float(answerOriginal[1])):
         correct = 0
         hint = "Tel de x-termen goed op aan de linkerzijde. Tel de constanten goed op aan de rechterzijde. Let goed op plus- en mintekens."
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 6)
-    elif answerGiven[0] != answerOriginal[0]:
+    elif round(float(answerGiven[0])) != round(float(answerOriginal[0])):
         correct = 0
         hint = "De linkerzijde heeft niet (alleen) het goede aantal x-termen. Let goed op plus- en mintekens."
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 2)
-    elif answerGiven[1] != answerOriginal[1]:
+    elif round(float(answerGiven[1])) !=  round(float(answerOriginal[1])): 
         correct = 0
         hint =  "De rechterzijde heeft niet de goede waarde, de constanten zijn niet goed opgeteld. Let goed op plus- en mintekens."
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 1)
-    elif answerGiven == answerOriginal:
+    elif ( (  round(float(answerGiven[0])) == - round(float(answerOriginal[0])) and round(float(answerGiven[1])) == round(float(answerOriginal[1]))   ) 
+        or ( round(float(answerGiven[0])) ==  round(float(answerOriginal[0])) and round(float(answerGiven[1])) == - round(float(answerOriginal[1]))  ) 
+        or  ( round(float(answerGiven[0])) == - round(float(answerOriginal[0])) and round(float(answerGiven[1])) == -round(float(answerOriginal[1]))  )) :
+        correct = 0
+        hint =  "Het antwoord is bijna goed, let goed op de plus- en mintekens!"
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 1) # ander soort fout?
+    elif round(float(answerGiven[0])) == round(float(answerOriginal[0])) and round(float(answerGiven[1])) == round(float(answerOriginal[1])):
         correct = 1
-        hint = ""
+        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         maxMistake = AnswerAnswered(request.user.id, 1, True, 0, 0)
     else:
         correct = 0
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 0)
-        hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+        hint = "Let op met plus- en mintekens wegstrepen."
 
     if maxMistake > 2 & (answerGiven != answerOriginal):
         toManyMistakes = True
@@ -421,11 +423,17 @@ def module1_1c(request):
     if  question["answer"]==0:
         question["answer"] = 1
     left = random.randint(-10,10)
+    if  left==0:
+        left = 1
     right = left*question["answer"]
     c = random.randint(-20,20)
     a = left + c
     b = random.randint(-20,20)
+    if b ==0:
+        b = -3
     d = right + b
+    if d == 0:
+        d = 7
     global variables
     variables = [a,b,c,d]
     question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)
@@ -439,7 +447,7 @@ def module1_1c(request):
     return render(request, 'module1/module1_1c.html', {'questions':questions})
 
 def module1_1c_from_module1_1b(request):
-    nextmodule = 3
+    nextModule = 3
     ResetCurrentQuestionCorrect (request.user.id, 1, nextModule)
     question = {}
     question["answer"] = random.randint(-20,20)
@@ -450,7 +458,13 @@ def module1_1c_from_module1_1b(request):
     c = random.randint(-20,20)
     a = left + c
     b = random.randint(-20,20)
+    if b ==0:
+        b = -3
     d = right + b
+    if d == 0:
+        d = 7
+    global variables
+    variables = [a,b,c,d]
     question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
     question["answer_1"] = a - c
     question["answer_2"] = d - b
@@ -466,23 +480,23 @@ def answer1_1c(request):
     answerGiven = float(request.POST['answer'])
     answerOriginal = float(correct_answer)
     answerDiv = round(1/answerOriginal,2)
-    if answerGiven == answerOriginal:
+    if answerGiven == round(float(answerOriginal),2):
         correct = 1
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
         maxMistake = AnswerAnswered(request.user.id, 1, True, 0, 0)
-    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
+    elif answerGiven == round(float( ( variables[3] + variables[1] )/ (variables[0] + variables[2] )), 2):
         correct = 0
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 6)
-    elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
+    elif answerGiven == round(float( (  variables[3] + variables[1] )/ (variables[0] - variables[2] )),2):
         correct = 0
         hint = "Let goed op met het optellen of aftrekken van de constanten."
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 1)
-    elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
+    elif answerGiven == round(float( (variables[3] - variables[1] ) / (variables[0] + variables[2] ) ), 2):
         correct = 0
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 2)
-    elif answerGiven == answerDiv:
+    elif round(float(answerGiven),2) == round(float(answerDiv),2):
         correct = 0
         hint = "Let op met delen."
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 3)
@@ -500,22 +514,90 @@ def answer1_1c(request):
     return render(request, 'accounts/answers/answer1_1c.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
         'correct': correct, 'hint': hint, 'question': question, 'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
-def module1_1d(request): #nu nog een copy van c.
+def module1_1d(request):
     question = {}
-    question["answer"] = random.randint(-20,20)
+    question["answer"] = random.randint(-10,10)
     if  question["answer"]==0:
         question["answer"] = 1
-    left = random.randint(-10,10)
-    right = left*question["answer"]
-    c = random.randint(-20,20)
-    a = left + c
-    b = random.randint(-20,20)
-    d = right + b
+    bottom = random.randint(-10,10)
+    if  bottom== 0:
+         bottom = 1
+    top = bottom*question["answer"]
+
+    #b,e,h,k : a + (bx+c). 
+    b = 1 #minus values cause a problem here..., prevents divide by zero for a (see below)
+    e = random.randint(-13,13)
+    h = random.randint(-5,5)
+    k = random.randint(-3,3)
+
+    #a,d,g,j: constants before brackets, solves with bottom 
+    g = 1 #minus values cause a problem here,  prevents divide by zero for i (see below)
+    d = random.randint(-5,5) 
+    j =  random.randint(-5,5)
+    a = (bottom - d*e + g*h + j*k)/b
+    if a == 0: #make sure solving is also carried through to 'top'-solve
+        d = d + 1
+        e = e + 2
+        h = h + 5
+        a = (bottom - d*e + g*h + j*k)/b
+    question["answer_bottom"] = a*b + d*e - g*h - j*k
+    
+    #c,f,g,i : constants in brackets, solve with top
+    c = random.randint(-1,1)
+    f = random.randint(-2,2)
+    l = random.randint(-20,20)
+    i = (top - j*l +a*c +d*f)/g
+    question["answer_top"] = g*i + j*l - a*c - d*f
+    
     global variables
-    variables = [a,b,c,d]
-    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
-    question["answer_1"] = a - c
-    question["answer_2"] = d - b
+    variables = [a,b,c,d,e,f,g,h,i,j,k,l]
+    question["question"] = "%d(%dt + %d) + %d(%dt + %d)  = %d(%dt + %d) + %d(%dt + %d)" %(a,b,c,d,e,f,g,h,i,j,k,l)
+    global correct_answer
+    correct_answer = question["answer"]
+    questions = []
+    questions.append(question)
+    return render(request, 'module1/module1_1d.html', {'questions':questions})
+
+def module1_1d_from_module1_1c(request):
+    nextModule = 4
+    ResetCurrentQuestionCorrect (request.user.id, 1, nextModule)
+    question = {}
+    question["answer"] = random.randint(-10,10)
+    if  question["answer"]==0:
+        question["answer"] = 1
+    bottom = random.randint(-10,10)
+    if  bottom== 0:
+         bottom = 1
+    top = bottom*question["answer"]
+
+    #b,e,h,k : a + (bx+c). 
+    b = 1 #minus values cause a problem here..., prevents divide by zero for a (see below)
+    e = random.randint(-13,13)
+    h = random.randint(-5,5)
+    k = random.randint(-3,3)
+
+    #a,d,g,j: constants before brackets, solves with bottom 
+    g = 1 #minus values cause a problem here,  prevents divide by zero for i (see below)
+    d = random.randint(-5,5) 
+    j =  random.randint(-5,5)
+    a = (bottom - d*e + g*h + j*k)/b
+    if a == 0: #make sure solving is also carried through to 'top'-solve
+        d = d + 1
+        e = e + 2
+        h = h + 5
+        a = (bottom - d*e + g*h + j*k)/b
+    question["answer_bottom"] = a*b + d*e - g*h - j*k
+    
+    #c,f,g,i : constants in brackets, solve with top
+    c = random.randint(-1,1)
+    f = random.randint(-2,2)
+    l = random.randint(-20,20)
+    i = (top - j*l +a*c +d*f)/g
+    question["answer_top"] = g*i + j*l - a*c - d*f
+    
+    global variables
+    variables = [a,b,c,d,e,f,g,h,i,j,k,l]
+    question["question"] = "%d(%dt + %d) + %d(%dt + %d)  = %d(%dt + %d) + %d(%dt + %d)" %(a,b,c,d,e,f,g,h,i,j,k,l)
     global correct_answer
     correct_answer = question["answer"]
     questions = []
@@ -523,16 +605,20 @@ def module1_1d(request): #nu nog een copy van c.
 
     return render(request, 'module1/module1_1d.html', {'questions':questions})
 
-def answer1_1d(request): # nu nog een copy van c.
-    question = "%sy + %s = %sy + %s" %(variables[0],variables[1],variables[2],variables[3])
+def answer1_1d(request): 
+    question = "%d(%dt + %d) + %d(%dt + %d)  = %d(%dt + %d) + %d(%dt + %d)" %(variables[0],variables[1],variables[2],variables[3],variables[4],variables[5], \
+        variables[6], variables[7],variables[8],variables[9],variables[10],variables[11])
     answerGiven = float(request.POST['answer'])
     answerOriginal = float(correct_answer)
     answerDiv = round(1/answerOriginal,2)
-    if answerGiven == answerOriginal:
+    if answerGiven ==  round(float(answerOriginal),2):
         correct = 1
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
+    elif answerGiven == - answerOriginal:
+        correct = 0
+        hint = "Maar bijna goed, let op met plus- en mintekens wegstrepen."
         AnswerAnswered(request.user.id, 1, True, 0, 0)
-    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
+    elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):  #!deze drie fouten zijn niet na te gaan met zoveel variabelen, zonder 'stapjes'input van student!
         correct = 0
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
         AnswerAnswered(request.user.id, 1, False, 0, 6)
@@ -550,7 +636,7 @@ def answer1_1d(request): # nu nog een copy van c.
         AnswerAnswered(request.user.id, 1, False, 0, 3)
     else:
        correct = 0 
-       hint = "Let goed op de plus- en mintekens."
+       hint = "Werk eerst de haakjes weg."
        AnswerAnswered(request.user.id, 1, False, 0, 0)
     
     return render(request, 'accounts/answers/answer1_1d.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
@@ -561,7 +647,7 @@ def module1_2(request):
     return render(request,'module1/module1_1.html', {'vraag': text} )
 
 def module1_2_from_module1_1c(request):
-    nexModule = 4
+    nextModule = 4
     ResetCurrentQuestionCorrect(request.user.id, 1, nextModule)
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1/module1_1.html', {'vraag': text} )
@@ -672,7 +758,6 @@ def confirmTeacher(request):
     else:
         alert("this password was incorrect")
     
-
 def MakeTeacher(user_id):
     database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
     #database = r"C:/MathApp/accounts/db.sqlite3"
