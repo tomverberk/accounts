@@ -297,7 +297,7 @@ def ResetCurrentQuestionCorrect(user_id, module_id, nextModule):
 
 def ResetCurrentQuestionCorrectDatabase(conn, user_id, module_id, nextModule):
     next_user_module = (nextModule, user_id, module_id)
-    sql = 'UPDATE accounts_module_user SET currentQuestionHints = 0, currentQuestionCorrect = 0, currentModule = ? WHERE user_id = ? AND module_id = ?'
+    sql = 'UPDATE accounts_module_user SET currentQuestionHints = 0, currentQuestionCorrect = 0, currentModule = ?, mistake1 = 0, mistake2 = 0, mistake3 = 0, mistake4 = 0, mistake5 = 0 WHERE user_id = ? AND module_id = ?'
 
     cur = conn.cursor()
     cur.execute(sql,next_user_module)
@@ -405,7 +405,7 @@ def answer1_1b(request):
         maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 0)
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
 
-    if maxMistake > 2 & (answerGiven != answerOriginal):
+    if maxMistake > 2:
         toManyMistakes = True
     else:
         toManyMistakes = False
@@ -439,7 +439,7 @@ def module1_1c(request):
     return render(request, 'module1/module1_1c.html', {'questions':questions})
 
 def module1_1c_from_module1_1b(request):
-    nextmodule = 3
+    nextModule = 3
     ResetCurrentQuestionCorrect (request.user.id, 1, nextModule)
     question = {}
     question["answer"] = random.randint(-20,20)
@@ -451,6 +451,8 @@ def module1_1c_from_module1_1b(request):
     a = left + c
     b = random.randint(-20,20)
     d = right + b
+    global variables
+    variables = [a,b,c,d]
     question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
     question["answer_1"] = a - c
     question["answer_2"] = d - b
@@ -523,6 +525,31 @@ def module1_1d(request): #nu nog een copy van c.
 
     return render(request, 'module1/module1_1d.html', {'questions':questions})
 
+def module1_1d_from_module1_1c(request): #nu nog een copy van c.
+    nextModule = 4
+    ResetCurrentQuestionCorrect (request.user.id, 1, nextModule)
+    question = {}
+    question["answer"] = random.randint(-20,20)
+    if  question["answer"]==0:
+        question["answer"] = 1
+    left = random.randint(-10,10)
+    right = left*question["answer"]
+    c = random.randint(-20,20)
+    a = left + c
+    b = random.randint(-20,20)
+    d = right + b
+    global variables
+    variables = [a,b,c,d]
+    question["question"] = "%sy + %s = %sy + %s" %(a,b,c,d)  #vary which terms have 'x'? # vary name 'x', # +- = -
+    question["answer_1"] = a - c
+    question["answer_2"] = d - b
+    global correct_answer
+    correct_answer = question["answer"]
+    questions = []
+    questions.append(question)
+
+    return render(request, 'module1/module1_1d.html', {'questions':questions})
+
 def answer1_1d(request): # nu nog een copy van c.
     question = "%sy + %s = %sy + %s" %(variables[0],variables[1],variables[2],variables[3])
     answerGiven = float(request.POST['answer'])
@@ -531,40 +558,47 @@ def answer1_1d(request): # nu nog een copy van c.
     if answerGiven == answerOriginal:
         correct = 1
         hint = "Doe de vraag nog een keer, of ga naar de volgende vraag."
-        AnswerAnswered(request.user.id, 1, True, 0, 0)
+        maxMistake = AnswerAnswered(request.user.id, 1, True, 0, 0)
     elif answerGiven == float(round(( variables[3] + variables[1] )/ (variables[0] + variables[2] ), 2)):
         correct = 0
         hint = "Let goed op plus- en mintekens bij het omzetten van beide termen."
-        AnswerAnswered(request.user.id, 1, False, 0, 6)
+        maxMistake =AnswerAnswered(request.user.id, 1, False, 0, 6)
     elif answerGiven == float(round((  variables[3] + variables[1] )/ (variables[0] - variables[2] ),2)):
         correct = 0
         hint = "Let goed op met het optellen of aftrekken van de constanten."
-        AnswerAnswered(request.user.id, 1, False, 0, 1)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 1)
     elif answerGiven == float(round(( variables[3] - variables[1] )/ (variables[0] + variables[2] ), 2)):
         correct = 0
         hint = "Let goed op met het optellen of aftrekken van de x-termen."
-        AnswerAnswered(request.user.id, 1, False, 0, 2)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 2)
     elif answerGiven == answerDiv:
         correct = 0
         hint = "Let op met delen."
-        AnswerAnswered(request.user.id, 1, False, 0, 3)
+        maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 3)
     else:
        correct = 0 
        hint = "Let goed op de plus- en mintekens."
-       AnswerAnswered(request.user.id, 1, False, 0, 0)
+       maxMistake = AnswerAnswered(request.user.id, 1, False, 0, 0)
+
+    if maxMistake > 2:
+        toManyMistakes = True
+    else:
+        toManyMistakes = False
+
+    nextQuestionPossible = IsNextQuestionPossible(request.user.id, 1)
     
     return render(request, 'accounts/answers/answer1_1d.html', {'answerGiven':answerGiven, 'answerOriginal':answerOriginal, \
-        'correct': correct, 'hint': hint, 'question': question})
+        'correct': correct, 'hint': hint, 'question': question,  'nextQuestionPossible':nextQuestionPossible, 'toManyMistakes': toManyMistakes})
 
 def module1_2(request):
     text = "Wat is het goede antwoord " # % number
     return render(request,'module1/module1_1.html', {'vraag': text} )
 
-def module1_2_from_module1_1c(request):
-    nexModule = 4
+def module1_2_from_module1_1d(request):
+    nexModule = 0
     ResetCurrentQuestionCorrect(request.user.id, 1, nextModule)
     text = "Wat is het goede antwoord " # % number
-    return render(request,'module1/module1_1.html', {'vraag': text} )
+    return render(request, 'module1/module1_2.html', {'questions':questions})
 
 def module1_3(request):
     text = "Wat is het goede antwoord " # % number

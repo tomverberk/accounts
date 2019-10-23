@@ -27,14 +27,9 @@
       Je hebt al meerdere malen dezelfde fout gemaakt, <br>
       misschien is het handig om hulp te vragen. <br><br>
     </div>
-    {% if toManyMistakes %}
-    <div>
-    Je hebt al meerder malen dezelfde fout gemaakt, <br>
-     misschien is het handig om hulp te vragen. <br><br>
-    </div>
     {% endif %}
     {% if nextQuestionPossible %}
-      <form action="{% url 'module1_2_from_module1_1d' %}"><button style="float: right" >Volgende vraag</button></form>
+      <form action="{% url 'home' %}"><button style="float: right" >Volgende vraag</button></form>
     {% else %}
       <button style="float: right ; background-color: lightgrey;" >Volgende vraag</button>
     {% endif %}
