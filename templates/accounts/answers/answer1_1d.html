@@ -4,16 +4,17 @@
 
 {% block content %}
 <div class="base">
-    Vraag: {{ question }}
+    Vraag: <br>
+    {{ question }}
     <br><br>
     Jouw antwoord: <br>
-    y = {{answerGiven}}
+    t = {{answerGiven}}
     <br><br>
     {% if correct %}
     Je antwoord is goed!<br><br>
     {% else %}
     Het juiste antwoord: <br>
-    y = {{answerOriginal}}
+    t = {{answerOriginal}}
     <br><br>
     Helaas, dat is niet goed. Probeer het nog een keer.
     <br><br>
@@ -22,12 +23,14 @@
        <b> Hint </b> : {{hint}}
       </div>
     {% endif %}
+
     {% if toManyMistakes %}
     <div>
       Je hebt al meerdere malen dezelfde fout gemaakt, <br>
       misschien is het handig om hulp te vragen. <br><br>
     </div>
     {% endif %}
+
     {% if nextQuestionPossible %}
       <form action="{% url 'home' %}"><button style="float: right" >Volgende vraag</button></form>
     {% else %}

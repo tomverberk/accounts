@@ -22,14 +22,17 @@ urlpatterns = [
     path('module1_1/', views.module1_1, name='module1_1'),
     path('module1_1a/', views.module1_1a, name='module1_1a'),
     path('module1_1a/answer/', views.answer1_1a, name='answer1_1a'),
+    
     path('module1_1b/', views.module1_1b, name='module1_1b'),
     path('module1_1b/answer/', views.answer1_1b, name='answer1_1b'),
     path('module1_1b_from_module1_1a', views.module1_1b_from_module1_1a, name='module1_1b_from_module1_1a'),
     path('module1_1b_from_module1_1a/answer/', views.answer1_1b, name='answer1_1b'),
+    
     path('module1_1c/', views.module1_1c, name='module1_1c'),
     path('module1_1c/answer/', views.answer1_1c, name='answer1_1c'),
     path('module1_1c_from_module1_1b', views.module1_1c_from_module1_1b, name='module1_1c_from_module1_1b'),
     path('module1_1c_from_module1_1b/answer/', views.answer1_1c, name='answer1_1c'),
+    
     path('module1_1d/', views.module1_1d, name='module1_1d'),
     path('module1_1d/answer/', views.answer1_1d, name='answer1_1d'),
     path('module1_1d_from_module1_1c', views.module1_1d_from_module1_1c, name='module1_1d_from_module1_1c'),
