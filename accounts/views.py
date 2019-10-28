@@ -184,7 +184,7 @@ def moduleOverview(request):     # maybe make this a normal class as well, and j
    return render(request, 'moduleOverview.html', {'Hoofdstukken overzicht': list} )
 
 def moduleCurrent(request):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
     #database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
@@ -697,7 +697,7 @@ def teacherOverview(request):
         return render(request, 'teacherconformation.html')
     
 def GetAllInfo():
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
     #database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
@@ -730,7 +730,7 @@ def GetAllInfoDatabase(conn):
     return recordsWithValue
 
 def IsTeacher(user_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
     #database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
@@ -759,7 +759,7 @@ def confirmTeacher(request):
         alert("this password was incorrect")
     
 def MakeTeacher(user_id):
-    database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
+    #database = r"C:/Users/s162449/Documents/Uni/year-4/quartile-1/0LAUK0-Robots-everywhere/accounts-Github/accounts/db.sqlite3"
     #database = r"C:/MathApp/accounts/db.sqlite3"
     # create a database connection
     conn = create_connection(database)
